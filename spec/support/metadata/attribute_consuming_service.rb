@@ -44,10 +44,10 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
     context 'attributes' do
       context 'lang' do
         it 'is rendered' do
-          expect(node['lang']).to be
+          expect(node['xml:lang']).not_to be_nil
         end
         it 'has expected value' do
-          expect(node['lang'])
+          expect(node['xml:lang'])
             .to eq(attribute_consuming_service.service_names.first.lang)
         end
       end
@@ -77,10 +77,10 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
     context 'attributes' do
       context 'lang' do
         it 'is rendered' do
-          expect(node['lang']).to be
+          expect(node['xml:lang']).not_to be_nil
         end
         it 'has expected value' do
-          expect(node['lang'])
+          expect(node['xml:lang'])
             .to eq(attribute_consuming_service.service_descriptions.first.lang)
         end
       end

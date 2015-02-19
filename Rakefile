@@ -10,3 +10,5 @@ task :brakeman do
 end
 
 task default: [:rubocop, :spec, :brakeman]
+
+task spec: :'xsd:all'

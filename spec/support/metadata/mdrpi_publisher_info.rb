@@ -29,7 +29,7 @@ RSpec.shared_examples 'mdrpi:PublisherInfo xml' do
         context 'attributes' do
           let(:node) { xml.first(:xpath, usage_policy_path) }
           it 'sets lang' do
-            expect(node['lang'])
+            expect(node['xml:lang'])
               .to eq(root_node.publication_info
                      .usage_policies.first.lang)
           end

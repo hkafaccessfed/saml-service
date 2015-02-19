@@ -29,6 +29,13 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
   end
 
   RSpec.shared_examples 'md:EntitiesDescriptor xml' do
+    let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
+    let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }
+
+    it 'is schema-valid' do
+      expect(validation_errors).to be_empty
+    end
+
     it 'is created' do
       expect(xml).to have_xpath(entities_descriptor_path)
     end

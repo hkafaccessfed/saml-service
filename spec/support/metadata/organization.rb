@@ -19,7 +19,8 @@ RSpec.shared_examples 'Organization xml' do
 
     context 'attributes' do
       it 'sets lang' do
-        expect(node['lang']).to eq(organization.organization_names.first.lang)
+        expect(node['xml:lang'])
+          .to eq(organization.organization_names.first.lang)
       end
     end
 
@@ -37,7 +38,7 @@ RSpec.shared_examples 'Organization xml' do
 
     context 'attributes' do
       it 'sets lang' do
-        expect(node['lang'])
+        expect(node['xml:lang'])
           .to eq(organization.organization_display_names.first.lang)
       end
     end
@@ -57,7 +58,7 @@ RSpec.shared_examples 'Organization xml' do
 
     context 'attributes' do
       it 'sets lang' do
-        expect(node['lang'])
+        expect(node['xml:lang'])
           .to eq(organization.organization_urls.first.lang)
       end
     end

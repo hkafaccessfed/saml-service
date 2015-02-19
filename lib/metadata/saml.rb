@@ -88,7 +88,7 @@ module Metadata
 
       mdrpi.PublicationInfo(ns, attrs) do |_|
         publication_info.usage_policies.each do |up|
-          mdrpi.UsagePolicy(up.uri, lang: up.lang)
+          mdrpi.UsagePolicy(up.uri, 'xml:lang' => up.lang)
         end
       end
     end
@@ -157,7 +157,7 @@ module Metadata
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
         mi.registration_info.registration_policies.each do |rp|
-          mdrpi.RegistrationPolicy(rp.uri, lang: rp.lang)
+          mdrpi.RegistrationPolicy(rp.uri, 'xml:lang' => rp.lang)
         end
       end
     end
@@ -165,15 +165,15 @@ module Metadata
     def organization(org)
       root.Organization(ns) do |_|
         org.organization_names.each do |name|
-          root.OrganizationName(name.value, lang: name.lang)
+          root.OrganizationName(name.value, 'xml:lang' => name.lang)
         end
 
         org.organization_display_names.each do |dname|
-          root.OrganizationDisplayName(dname.value, lang: dname.lang)
+          root.OrganizationDisplayName(dname.value, 'xml:lang' => dname.lang)
         end
 
         org.organization_urls.each do |url|
-          root.OrganizationURL(url.uri, lang: url.lang)
+          root.OrganizationURL(url.uri, 'xml:lang' => url.lang)
         end
       end
     end
@@ -341,12 +341,12 @@ module Metadata
       }
       root.AttributeConsumingService(ns, attributes) do |_acs_node|
         acs.service_names.each do |service_name|
-          root.ServiceName(service_name.value, lang: service_name.lang)
+          root.ServiceName(service_name.value, 'xml:lang' => service_name.lang)
         end
 
         acs.service_descriptions.each do |service_description|
           root.ServiceDescription(service_description.value,
-                                  lang: service_description.lang)
+                                  'xml:lang' => service_description.lang)
         end
 
         acs.requested_attributes.each do |ra|

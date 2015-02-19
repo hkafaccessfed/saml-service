@@ -32,7 +32,7 @@ RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
       end
       context 'attributes' do
         it 'sets policy language' do
-          expect(node['lang']).to eq(rp.lang)
+          expect(node['xml:lang']).to eq(rp.lang)
         end
       end
       it 'sets policy value to policy URI' do
