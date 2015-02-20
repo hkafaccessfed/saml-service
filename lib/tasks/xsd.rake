@@ -40,7 +40,6 @@ namespace :xsd do
     response = Net::HTTP.get_response(URI.parse(uri))
     response.value
 
-    FileUtils.mkdir_p('schema')
     File.open(t.name, 'w').write(response.body)
     puts ' done.'
   end
