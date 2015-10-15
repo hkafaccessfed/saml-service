@@ -4,9 +4,9 @@ module API
   RSpec.describe EntityController, type: :request do
     let(:json) { JSON.parse(response.body) }
 
-    context 'get /api/entities' do
+    context 'get /api/entity/index.json' do
       def run
-        get '/api/entities', nil, headers
+        get '/api/entity/index.json'
       end
 
       let!(:entity) { create(:known_entity) }
