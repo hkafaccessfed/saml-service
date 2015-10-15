@@ -22,11 +22,10 @@ Rails.application.routes.draw do
 
   # this is for test
   get 'api/endpoint_entities/index', format: :json
-  get 'api/entities/index'
 
-  # namespace :api, defaults: { format: 'json' } do
-  #   scope constraints: APIConstraints.new(version: 1, default: true) do
-  #     # TODO
-  #   end
-  # end
+  namespace :api, defaults: { format: 'json' } do
+    scope constraints: APIConstraints.new(version: 1, default: true) do
+      # TODO
+    end
+  end
 end
