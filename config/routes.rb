@@ -21,11 +21,12 @@ Rails.application.routes.draw do
         to: 'metadata_query#tagged_entities', via: :all
 
   # this is for test
-  get 'api/entity/index', format: :json
+  get 'api/endpoint_entities/index', format: :json
+  get 'api/entities/index'
 
-  namespace :api, defaults: { format: 'json' } do
-    scope constraints: APIConstraints.new(version: 1, default: true) do
-      # TODO
-    end
-  end
+  # namespace :api, defaults: { format: 'json' } do
+  #   scope constraints: APIConstraints.new(version: 1, default: true) do
+  #     # TODO
+  #   end
+  # end
 end

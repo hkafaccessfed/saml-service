@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe API::EntityController, type: :controller do
+RSpec.describe API::EndpointEntitiesController, type: :controller do
   describe 'GET #index' do
     it 'returns http success' do
       get :index, format: :json

@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 module API
-  RSpec.describe EntityController, type: :request do
+  RSpec.describe EndpointEntitiesController, type: :request do
     let(:json) { JSON.parse(response.body) }
 
-    context 'get /api/entity/index.json' do
+    context 'get /api/endpoint_entity/index.json' do
       def run
-        get '/api/entity/index.json'
+        get '/api/endpoint_entity/index.json'
       end
 
       let!(:entity) { create(:known_entity) }

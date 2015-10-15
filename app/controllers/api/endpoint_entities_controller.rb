@@ -1,5 +1,5 @@
 module API
-  class EntityController < APIController
+  class EndpointEntitiesController < APIController
     skip_before_action :ensure_authenticated
 
     def index
