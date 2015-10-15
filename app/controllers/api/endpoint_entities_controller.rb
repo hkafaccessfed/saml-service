@@ -5,7 +5,29 @@ module API
     def index
       public_action
 
-      @entities = KnownEntity.all
+      @entities = json_entitites[:entities]
+    end
+
+    private
+
+    # rubocop:disable MethodLength
+    def json_entitites
+      # this will change
+      {
+        entities: [
+          {
+            entity_id: 'https://vho.test.aaf.edu.au/idp/shibboleth',
+            name: 'AAF Virtual Home',
+            tags: %w(discovery idp aaf vho)
+          },
+          {
+            entity_id: 'https://vho.test.aaf.edu.au/shibboleth',
+            discovery_response: 'https://vho.test.aaf.edu.au/Shibboleth.sso/Login',
+            name: 'AAF Virtual Home SP',
+            tags: %w(aaf sp)
+          }
+        ]
+      }
     end
   end
 end
