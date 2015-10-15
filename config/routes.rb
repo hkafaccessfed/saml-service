@@ -25,7 +25,7 @@ Rails.application.routes.draw do
       # TODO
     end
 
-    match '/json_entities',
-          to: 'endpoint_entities#index', via: :get
+    get '/:primary_tag/json_entities',
+        to: 'endpoint_entities#index', via: :get
   end
 end
