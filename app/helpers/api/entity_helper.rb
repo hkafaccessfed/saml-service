@@ -1,2 +1,4 @@
-module API::EntityHelper
+module API
+  module EntityHelper
+  end
 end

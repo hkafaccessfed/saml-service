@@ -17,4 +17,10 @@ Rails.application.routes.draw do
 
   match '/:primary_tag/entities/:identifier',
         to: 'metadata_query#tagged_entities', via: :all
+
+  # this is for test
+  # match 'entities', to: 'api/entity#index', via: :get
+  namespace :api, defaults: { format: 'json' } do
+    get 'entities' => 'entity#index'
+  end
 end

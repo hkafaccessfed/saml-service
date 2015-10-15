@@ -1,5 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe API::EntityController, type: :controller do
-
+module API
+  RSpec.describe EntityController, type: :controller do
+  end
 end
