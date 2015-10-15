@@ -2,11 +2,10 @@ require 'rails_helper'
 
 module API
   RSpec.describe EndpointEntitiesController, type: :request do
-    let(:json) { JSON.parse(response.body) }
-
-    context 'get /api/endpoint_entity/index.json' do
+    let(:json) { JSON.parse(response.body, symbolize_names: true) }
+    context 'get /api/endpoint_entities/index.json' do
       def run
-        get '/api/endpoint_entity/index.json'
+        get '/api/endpoint_entities/index.json'
       end
 
       let!(:entity) { create(:known_entity) }
@@ -14,7 +13,7 @@ module API
 
       it 'lists the entities' do
         expect(json[:entities])
-          .to include(entity_id: entity.id)
+          .to include(Hash)
       end
     end
   end
