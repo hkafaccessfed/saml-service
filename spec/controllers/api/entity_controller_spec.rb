@@ -10,7 +10,7 @@ module API
 
       let(:json) { JSON.parse(response.body) }
 
-      context 'get /entities' do
+      context 'get /api/entities' do
         def run
           get :index, format: :json
         end
@@ -18,10 +18,9 @@ module API
         let!(:entity) { create(:known_entity) }
         before { run }
 
-        it 'gets the entities' do
-          # not_to include for instance
-          expect(json[:entity])
-            .not_to include(not_to: 'not_to')
+        it 'lists the entities' do
+          expect(json[:entities])
+            .not_to include(name: 'entity.name')
         end
       end
     end
