@@ -20,12 +20,12 @@ Rails.application.routes.draw do
   match '/:primary_tag/entities/:identifier',
         to: 'metadata_query#tagged_entities', via: :all
 
-  # this is for test
-  get 'api/endpoint_entities/index', format: :json
-
   namespace :api, defaults: { format: 'json' } do
     scope constraints: APIConstraints.new(version: 1, default: true) do
       # TODO
     end
+
+    match '/json_entities',
+          to: 'endpoint_entities#index', via: :get
   end
 end
