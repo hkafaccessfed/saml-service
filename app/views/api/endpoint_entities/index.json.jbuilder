@@ -1,1 +1,1 @@
-json.entities @entities, :entity_id, :name, :tags
+json.entities @entities, :entity_id, :tags
