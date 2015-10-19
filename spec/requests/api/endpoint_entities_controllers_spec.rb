@@ -10,11 +10,12 @@ module API
       end
 
       let!(:entity) { create(:known_entity) }
+
       before { run }
 
       it 'lists the entities' do
         expect(json[:entities])
-          .to include(Hash)
+          .to include(entity_id: entity.entity_id, tags: entity.tags)
       end
     end
   end

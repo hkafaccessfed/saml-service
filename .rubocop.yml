@@ -8,6 +8,7 @@ AllCops:
     - bin/**/*
     - db/**/*
     - Guardfile
+    - app/views/endpoint_entities/index.json.jbuilder
 
 AbcSize:
   Exclude:
