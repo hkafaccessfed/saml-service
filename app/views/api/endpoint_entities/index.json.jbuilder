@@ -1,19 +1,14 @@
-json.entities @entities do |ent|
-  json.entity_id ent.entity_id
+json.identity_providers @idp_ents do |ent|
+  json.entity_id ent
+  json.names ent
+  json.tags ent
+end if @idp_ents.size > 0
 
-  names = begin
-    ent.entity_descriptor
-    .idp_sso_descriptors.first.ui_info.display_names
-  rescue
-    nil
-  end
+json.service_providers @sp_ents do |ent|
+  json.entity_id ent
+  json.descovery_response ent
+  json.names ent
+  json.tags ent
+end if @sp_ents.size > 0
 
-  if names
-    json.names names do |name|
-      json.value name.value
-      json.lang name.lang
-    end
-  end
-
-  json.tags ent.tags
-end
+@all
