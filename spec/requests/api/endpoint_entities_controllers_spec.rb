@@ -11,10 +11,17 @@ module API
 
       let!(:entity) { create(:known_entity) }
 
-      # it 'lists the entities' do
-      #   expect(json[:entities])
-      #     .to include(entity_id: entity.entity_id, tags: entity.tags)
-      # end
+      before { run }
+
+      it 'lists the identity_providers' do
+        expect(json[:identity_providers])
+          .to include(entity_id: entity.entity_id, tags: entity.tags)
+      end
+
+      it 'lists the service_providers' do
+        expect(json[:service_providers])
+          .to include(entity_id: entity.entity_id, tags: entity.tags)
+      end
     end
   end
 end

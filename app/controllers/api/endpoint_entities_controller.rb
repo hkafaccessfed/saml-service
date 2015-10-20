@@ -8,7 +8,7 @@ module API
       @idp_ents = filter_func(IDPSSODescriptor.all)
       @sp_ents = filter_func(SPSSODescriptor.all)
 
-      # this might be helpful for testing purposes 
+      # this might be helpful for testing purposes
       # @all_ents = KnownEntity.all
     end
 
