@@ -32,7 +32,7 @@ module API
       it 'lists the service_providers' do
         expect(json[:service_providers])
           .to include(entity_id: sp.entity_descriptor.known_entity.entity_id,
-                      descovery_response: sp.discovery_response_services.first,
+                      discovery_response: sp.discovery_response_services.first,
                       names: include(value: sp.ui_info
                                             .display_names.first.value,
                                      lang: sp.ui_info

@@ -15,9 +15,8 @@ json.service_providers @sp_ents do |ent|
   json.entity_id ent.entity_descriptor.known_entity.entity_id
 
   # not sure about discovery_response!! still working on it :)
-  # if ent.discovery_response_services.first
-  json.descovery_response ent.discovery_response_services.first
-  # end
+  json.discovery_response DiscoveryResponseService
+    .where(sp_sso_descriptor_id: ent.id, is_default: true).first
 
   json.names ent.ui_info.display_names do |name|
     json.value name.value
