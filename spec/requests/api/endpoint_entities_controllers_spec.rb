@@ -9,18 +9,28 @@ module API
         get '/api/json_entities'
       end
 
-      let!(:entity) { create(:known_entity) }
+      let!(:idp) do
+        create(:idp_sso_descriptor, :with_ui_info)
+          .entity_descriptor
+      end
 
-      before { run }
+      let!(:sp) do
+        create(:sp_sso_descriptor, :with_ui_info)
+          .entity_descriptor
+      end
+
+      before(:example) { run }
 
       it 'lists the identity_providers' do
         expect(json[:identity_providers])
-          .to include(entity_id: entity.entity_id, tags: entity.tags)
+          .to include(entity_id: idp.known_entity.entity_id,
+                      tags: idp.known_entity.tags)
       end
 
       it 'lists the service_providers' do
         expect(json[:service_providers])
-          .to include(entity_id: entity.entity_id, tags: entity.tags)
+          .to include(entity_id: sp.known_entity.entity_id,
+                      tags: sp.known_entity.tags)
       end
     end
   end
