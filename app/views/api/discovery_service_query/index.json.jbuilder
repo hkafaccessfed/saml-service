@@ -1,5 +1,5 @@
 # IDPSSODescriptor.all
-json.identity_providers @idp_ents do |ent|
+json.identity_providers @identity_providers do |ent|
   json.entity_id ent.entity_descriptor.known_entity.entity_id
 
   json.names ent.ui_info.display_names do |name|
@@ -8,10 +8,10 @@ json.identity_providers @idp_ents do |ent|
   end
 
   json.tags ent.entity_descriptor.known_entity.tags
-end if @idp_ents.size > 0
+end
 
 # SPSSODescriptor.all
-json.service_providers @sp_ents do |ent|
+json.service_providers @service_providers do |ent|
   json.entity_id ent.entity_descriptor.known_entity.entity_id
 
   # not sure about discovery_response!! still working on it :)
@@ -24,4 +24,4 @@ json.service_providers @sp_ents do |ent|
   end
 
   json.tags ent.entity_descriptor.known_entity.tags
-end if @sp_ents.size > 0
+end

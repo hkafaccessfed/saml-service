@@ -1,12 +1,12 @@
 require 'rails_helper'
 
 module API
-  RSpec.describe EndpointEntitiesController, type: :request do
+  RSpec.describe DiscoveryServiceQueryController, type: :request do
     let(:json) { JSON.parse(response.body, symbolize_names: true) }
 
-    context 'get /api/json_entities' do
+    context 'get /api/discovery_service_query' do
       def run
-        get '/api/json_entities'
+        get '/api/discovery_service_query'
       end
 
       let!(:idp) do
