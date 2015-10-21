@@ -15,7 +15,8 @@ json.service_providers @service_providers do |sp|
   json.entity_id sp.entity_descriptor.known_entity.entity_id
 
   sp_disc_response = sp.discovery_response_services
-                     .find { |q| q if q[:is_default] }
+                     .find { |q| q[:is_default] } ||
+                     sp.discovery_response_services.first
 
   json.discovery_response sp_disc_response
 
