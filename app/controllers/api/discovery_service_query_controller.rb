@@ -5,13 +5,13 @@ module API
     def index
       public_action
 
-      @identity_providers = filter_functioning(IDPSSODescriptor.all)
-      @service_providers = filter_functioning(SPSSODescriptor.all)
+      @identity_providers = select_with_functioning(IDPSSODescriptor.all)
+      @service_providers = select_with_functioning(SPSSODescriptor.all)
     end
 
     private
 
-    def filter_functioning(entities_list)
+    def select_with_functioning(entities_list)
       entities_list.select { |l| l.entity_descriptor.functioning? }
     end
   end
