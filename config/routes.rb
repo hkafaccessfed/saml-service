@@ -20,14 +20,10 @@ Rails.application.routes.draw do
   match '/:primary_tag/entities/:identifier',
         to: 'metadata_query#tagged_entities', via: :all
 
-  get 'api/discovery_service_query/index'
-
   namespace :api, defaults: { format: 'json' } do
     scope constraints: APIConstraints.new(version: 1, default: true) do
-      # TODO
+      get '/discovery_service_query',
+          to: 'discovery_service_query#index'
     end
-
-    get '/discovery_service_query',
-        to: 'discovery_service_query#index', via: :get
   end
 end
