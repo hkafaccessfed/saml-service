@@ -34,14 +34,15 @@ module API
       end
 
       context '.select_with_functioning' do
-        let!(:idp_sso) { create(:idp_sso_descriptor) }
-        let!(:sp_sso) { create(:sp_sso_descriptor) }
-
-        before do
-          idp_sso.entity_descriptor.update(enabled: false)
-          sp_sso.entity_descriptor.update(enabled: false)
-          get :index, format: :json
+        let!(:idp_sso) do
+          create(:idp_sso_descriptor, :with_disabled_entity_desc)
         end
+
+        let!(:sp_sso) do
+          create(:sp_sso_descriptor, :with_disabled_entity_desc)
+        end
+
+        before { get :index, format: :json }
 
         it 'shouldn\'t select @identity_providers with false .functioning?' do
           expect(assigns(:identity_providers))
