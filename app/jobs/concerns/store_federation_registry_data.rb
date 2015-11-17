@@ -15,7 +15,7 @@ module StoreFederationRegistryData
   end
 
   def update_by_fr_id(dataset, fr_id, attrs)
-    obj = FederationRegistryObject.local_instance(fr_id, dataset.model.name)
+    obj = FederationRegistryObject.local_instance(fr_id, dataset)
     obj.try(:update, attrs)
     obj
   end

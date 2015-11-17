@@ -31,7 +31,7 @@ module ETL
 
     def rd_contact(contact_person)
       FederationRegistryObject.local_instance(contact_person[:contact][:id],
-                                              Contact.name)
+                                              Contact.dataset)
     end
 
     def regexp_scope?(scope)
