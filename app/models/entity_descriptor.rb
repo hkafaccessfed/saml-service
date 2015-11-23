@@ -22,7 +22,6 @@ class EntityDescriptor < Sequel::Model
                                     idp_sso_descriptors: :destroy,
                                     sp_sso_descriptors: :destroy,
                                     attribute_authority_descriptors: :destroy,
-                                    attribute_authority_descriptors: :destroy,
                                     entity_id: :destroy,
                                     registration_info: :destroy,
                                     publication_info: :destroy,
