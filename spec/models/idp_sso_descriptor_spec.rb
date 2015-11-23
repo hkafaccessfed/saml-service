@@ -144,4 +144,21 @@ describe IDPSSODescriptor do
       end
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :idp_sso_descriptor, :with_requests_signed,
+             :with_key_descriptors, :with_ui_info,
+             :with_single_logout_services, :with_manage_name_id_services,
+             :with_artifact_resolution_services, :with_name_id_formats,
+             :with_multiple_single_sign_on_services,
+             :with_assertion_id_request_services,
+             :with_name_id_mapping_services, :with_attribute_profiles,
+             :with_attributes, :with_disco_hints
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

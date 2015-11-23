@@ -170,4 +170,16 @@ describe RoleDescriptor do
       it { is_expected.not_to be_edugain_compliant }
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :role_descriptor, :with_error_url, :with_key_descriptors,
+             :with_extensions, :with_organization,
+             :with_contacts, :with_scopes, :with_ui_info
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

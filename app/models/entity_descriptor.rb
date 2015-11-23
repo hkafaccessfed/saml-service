@@ -1,6 +1,4 @@
 class EntityDescriptor < Sequel::Model
-  plugin :touch
-
   many_to_one :known_entity
   many_to_one :organization
 
@@ -16,6 +14,19 @@ class EntityDescriptor < Sequel::Model
   one_to_one :registration_info, class: 'MDRPI::RegistrationInfo'
   one_to_one :publication_info, class: 'MDRPI::PublicationInfo'
   one_to_one :entity_attribute, class: 'MDATTR::EntityAttribute'
+
+  plugin :touch
+  plugin :association_dependencies, additional_metadata_locations: :destroy,
+                                    contact_people: :destroy,
+                                    role_descriptors: :destroy,
+                                    idp_sso_descriptors: :destroy,
+                                    sp_sso_descriptors: :destroy,
+                                    attribute_authority_descriptors: :destroy,
+                                    attribute_authority_descriptors: :destroy,
+                                    entity_id: :destroy,
+                                    registration_info: :destroy,
+                                    publication_info: :destroy,
+                                    entity_attribute: :destroy
 
   def validate
     super

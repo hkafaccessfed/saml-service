@@ -1,14 +1,16 @@
 class Attribute < Sequel::Model
   include Parents
 
-  plugin :class_table_inheritance
-
   one_to_one :name_format
   one_to_many :attribute_values
 
   many_to_one :idp_sso_descriptor
   many_to_one :attribute_authority_descriptor
   many_to_one :entity_attribute, class: 'MDATTR::EntityAttribute'
+
+  plugin :class_table_inheritance
+  plugin :association_dependencies, name_format: :destroy,
+                                    attribute_values: :destroy
 
   def validate
     super

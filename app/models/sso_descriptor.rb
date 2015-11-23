@@ -4,6 +4,11 @@ class SSODescriptor < RoleDescriptor
   one_to_many :manage_name_id_services
   one_to_many :name_id_formats
 
+  plugin :association_dependencies, artifact_resolution_services: :destroy,
+                                    single_logout_services: :destroy,
+                                    manage_name_id_services: :destroy,
+                                    name_id_formats: :destroy
+
   def validate
     super
   end

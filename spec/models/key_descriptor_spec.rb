@@ -10,4 +10,14 @@ describe KeyDescriptor do
       it { is_expected.to validate_includes [:encryption, :signing], :key_type }
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :key_descriptor, :encryption
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

@@ -34,5 +34,26 @@ FactoryGirl.define do
                                      :with_refeds_rs_entity_category
       end
     end
+
+    trait :with_idp do
+      after :create do |ed|
+        ed.add_idp_sso_descriptor create :idp_sso_descriptor,
+                                         entity_descriptor: ed
+      end
+    end
+
+    trait :with_sp do
+      after :create do |ed|
+        ed.add_sp_sso_descriptor create :sp_sso_descriptor,
+                                        entity_descriptor: ed
+      end
+    end
+
+    trait :with_aa do
+      after :create do |ed|
+        ed.add_attribute_authority_descriptor(
+          create :attribute_authority_descriptor, entity_descriptor: ed)
+      end
+    end
   end
 end

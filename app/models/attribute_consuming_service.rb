@@ -4,6 +4,10 @@ class AttributeConsumingService < Sequel::Model
   one_to_many :service_descriptions
   one_to_many :requested_attributes
 
+  plugin :association_dependencies, service_names: :destroy,
+                                    service_descriptions: :destroy,
+                                    requested_attributes: :destroy
+
   def validate
     super
     validates_presence [:created_at, :updated_at]

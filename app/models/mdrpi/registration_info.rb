@@ -7,6 +7,8 @@ module MDRPI
 
     one_to_many :registration_policies
 
+    plugin :association_dependencies, registration_policies: :destroy
+
     def validate
       super
       validates_presence [:registration_authority, :created_at, :updated_at]

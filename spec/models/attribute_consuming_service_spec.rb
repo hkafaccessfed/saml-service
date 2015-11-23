@@ -18,4 +18,14 @@ describe AttributeConsumingService do
     subject.requested_attributes.clear
     expect(subject).not_to be_valid
   end
+
+  describe '#destroy' do
+    subject do
+      create :attribute_consuming_service
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

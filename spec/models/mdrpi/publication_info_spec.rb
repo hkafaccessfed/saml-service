@@ -39,4 +39,14 @@ RSpec.describe MDRPI::PublicationInfo, type: :model do
       expect(subject).not_to be_valid
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :mdrpi_publication_info
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

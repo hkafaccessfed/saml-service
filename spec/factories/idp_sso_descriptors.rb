@@ -87,7 +87,7 @@ FactoryGirl.define do
 
     trait :with_disco_hints do
       after(:create) do |idp|
-        idp.disco_hints = create :mdui_disco_hint
+        idp.disco_hints = create :mdui_disco_hints_with_content
       end
     end
   end

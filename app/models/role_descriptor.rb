@@ -1,6 +1,4 @@
 class RoleDescriptor < Sequel::Model
-  plugin :class_table_inheritance, key: :kind
-
   many_to_one :entity_descriptor
   many_to_one :organization
 
@@ -10,6 +8,13 @@ class RoleDescriptor < Sequel::Model
   one_to_many :scopes, class: 'SHIBMD::Scope'
 
   one_to_one :ui_info, class: 'MDUI::UIInfo'
+
+  plugin :class_table_inheritance, key: :kind
+  plugin :association_dependencies, protocol_supports: :destroy,
+                                    key_descriptors: :destroy,
+                                    contact_people: :destroy,
+                                    scopes: :destroy,
+                                    ui_info: :destroy
 
   def validate
     super

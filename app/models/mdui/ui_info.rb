@@ -9,6 +9,13 @@ module MDUI
     one_to_many :information_urls
     one_to_many :privacy_statement_urls
 
+    plugin :association_dependencies, display_names: :destroy,
+                                      descriptions: :destroy,
+                                      keyword_lists: :destroy,
+                                      logos: :destroy,
+                                      information_urls: :destroy,
+                                      privacy_statement_urls: :destroy
+
     def validate
       super
       validates_presence [:role_descriptor, :created_at, :updated_at]

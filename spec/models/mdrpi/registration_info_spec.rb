@@ -55,4 +55,14 @@ RSpec.describe MDRPI::RegistrationInfo, type: :model do
         .to eq(subject.registration_instant.utc)
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :mdrpi_registration_info
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

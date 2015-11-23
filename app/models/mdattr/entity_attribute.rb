@@ -7,6 +7,8 @@ module MDATTR
 
     one_to_many :attributes, class: 'Attribute'
 
+    plugin :association_dependencies, attributes: :destroy
+
     def validate
       super
       validates_presence [:created_at, :updated_at]

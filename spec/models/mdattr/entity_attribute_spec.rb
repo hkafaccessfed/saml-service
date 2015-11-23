@@ -44,4 +44,14 @@ RSpec.describe MDATTR::EntityAttribute, type: :model do
       end
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :mdattr_entity_attribute, :with_refeds_rs_entity_category
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end
