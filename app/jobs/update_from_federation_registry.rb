@@ -9,6 +9,7 @@ class UpdateFromFederationRegistry
   include ETL::Organizations
   include ETL::EntityDescriptors
   include ETL::IdentityProviders
+  include ETL::AttributeAuthorities
 
   attr_reader :fr_source, :source, :primary_tag
 

@@ -29,6 +29,7 @@ module ETL
       entity_id(ed, ed_data)
       registration_info(ed)
       identity_providers(ed, ed_data)
+      attribute_authorities(ed, ed_data)
     end
 
     def tag_known_entity(ed)
