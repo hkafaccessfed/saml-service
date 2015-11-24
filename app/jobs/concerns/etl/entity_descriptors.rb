@@ -27,9 +27,10 @@ module ETL
 
     def ed_saml_core(ed, ed_data)
       entity_id(ed, ed_data)
-      registration_info(ed)
+      registration_info(ed, ed_data)
       identity_providers(ed, ed_data)
       attribute_authorities(ed, ed_data)
+      service_providers(ed, ed_data)
     end
 
     def tag_known_entity(ed)
@@ -48,11 +49,14 @@ module ETL
       EntityId.create(uri: ed_data[:entity_id], entity_descriptor: ed)
     end
 
-    def registration_info(ed)
-      return if ed.registration_info
-      ri = MDRPI::RegistrationInfo.create(registration_authority:
-                                          @fr_source.registration_authority,
-                                          entity_descriptor: ed)
+    def registration_info(ed, ed_data)
+      return if ed.registration_info.present?
+
+      ri = MDRPI::RegistrationInfo.create(
+        registration_authority: @fr_source.registration_authority,
+        registration_instant: Time.parse(ed_data[:created_at]),
+        entity_descriptor: ed)
+
       MDRPI::RegistrationPolicy.create(
         registration_info: ri,
         uri: @fr_source.registration_policy_uri,

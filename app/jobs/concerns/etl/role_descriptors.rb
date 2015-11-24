@@ -1,7 +1,7 @@
 module ETL
   module RoleDescriptors
     def role_descriptor(rd, rd_data, scopes_data)
-      scopes(rd, scopes_data)
+      scopes(rd, scopes_data) if scopes_data
       contact_people(rd, rd_data[:contact_people])
       protocol_supports(rd, rd_data[:protocol_support_enumerations])
       key_descriptors(rd, rd_data[:key_descriptors])

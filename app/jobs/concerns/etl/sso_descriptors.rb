@@ -2,7 +2,7 @@ module ETL
   module SSODescriptors
     include RoleDescriptors
 
-    def sso_descriptor(sd, sd_data, scopes_data)
+    def sso_descriptor(sd, sd_data, scopes_data = nil)
       rd_data = sd_data[:role_descriptor]
       role_descriptor(sd, rd_data, scopes_data)
 
