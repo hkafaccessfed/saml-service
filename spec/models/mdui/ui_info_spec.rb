@@ -20,4 +20,15 @@ RSpec.describe MDUI::UIInfo, type: :model do
     it { is_expected.to have_one_to_many :information_urls }
     it { is_expected.to have_one_to_many :privacy_statement_urls }
   end
+
+  describe '#destroy' do
+    subject do
+      create :mdui_ui_info, :with_multiple_display_names,
+             :with_multiple_descriptions, :with_content
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

@@ -7,6 +7,8 @@ module MDRPI
 
     one_to_many :usage_policies
 
+    plugin :association_dependencies, usage_policies: :destroy
+
     def validate
       super
       validates_presence [:publisher, :created_at, :updated_at]

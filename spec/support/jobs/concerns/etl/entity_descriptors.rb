@@ -74,6 +74,10 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     stub_fr_request(:entity_descriptors)
     allow_any_instance_of(described_class).to receive(:identity_providers)
       .with(kind_of(EntityDescriptor), anything)
+    allow_any_instance_of(described_class).to receive(:attribute_authorities)
+      .with(kind_of(EntityDescriptor), anything)
+    allow_any_instance_of(described_class).to receive(:service_providers)
+      .with(kind_of(EntityDescriptor), anything)
   end
 
   def run

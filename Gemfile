@@ -56,6 +56,6 @@ group :development, :test do
   gem 'guard-rubocop', require: false
   gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
-  gem 'pry-rails', require: false
+  gem 'pry-rails'
   gem 'pry-byebug'
 end

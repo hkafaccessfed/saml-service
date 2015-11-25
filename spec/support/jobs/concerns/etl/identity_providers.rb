@@ -7,6 +7,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       id: idp.id,
       display_name: Faker::Lorem.sentence,
       description: Faker::Lorem.sentence,
+      attribute_authority_only: false,
       functioning: idp.functioning?,
       created_at: idp_created_at,
       saml: {

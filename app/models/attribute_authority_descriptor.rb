@@ -5,6 +5,12 @@ class AttributeAuthorityDescriptor < RoleDescriptor
   one_to_many :attribute_profiles
   one_to_many :attributes
 
+  plugin :association_dependencies, attribute_services: :destroy,
+                                    assertion_id_request_services: :destroy,
+                                    name_id_formats: :destroy,
+                                    attribute_profiles: :destroy,
+                                    attributes: :destroy
+
   def validate
     super
     validates_presence :attribute_services, allow_missing: new?

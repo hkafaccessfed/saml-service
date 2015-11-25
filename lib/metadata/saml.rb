@@ -13,7 +13,10 @@ module Metadata
     def attribute_base(attr, scope)
       scope.parent[:Name] = attr.name
       scope.parent[:NameFormat] = attr.name_format.uri if attr.name_format
-      scope.parent[:FriendlyName] = attr.friendly_name if attr.friendly_name
+
+      if attr.friendly_name.present?
+        scope.parent[:FriendlyName] = attr.friendly_name
+      end
 
       attr.attribute_values.each do |attr_val|
         attribute_value(attr_val)
@@ -43,7 +46,7 @@ module Metadata
     end
 
     def sign
-      Xmldsig::SignedDocument.new(builder.doc).sign(key)
+      Xmldsig::SignedDocument.new(builder.doc.to_xml(indent: 2)).sign(key)
     end
 
     def entities_descriptor(known_entities)
@@ -156,9 +159,9 @@ module Metadata
 
     def key_info(ki)
       ds.KeyInfo(ns) do |_|
-        ds.KeyName ki.key_name if ki.key_name
+        ds.KeyName ki.key_name if ki.key_name.present?
         ds.X509Data do |_|
-          ds.X509SubjectName ki.subject if ki.subject
+          ds.X509SubjectName ki.subject if ki.subject.present?
           ds.X509Certificate ki.certificate_without_anchors
         end
       end
@@ -281,18 +284,20 @@ module Metadata
       attributes = { contactType: cp.contact_type }
       c = cp.contact
       root.ContactPerson(ns, attributes) do |_|
-        root.Company(c.company) if c.company
-        root.GivenName(c.given_name) if c.given_name
-        root.SurName(c.surname) if c.surname
-        root.EmailAddress("mailto:#{c.email_address}") if c.email_address
-        root.TelephoneNumber(c.telephone_number) if c.telephone_number
+        root.Company(c.company) if c.company.present?
+        root.GivenName(c.given_name) if c.given_name.present?
+        root.SurName(c.surname) if c.surname.present?
+        unless c.email_address.blank?
+          root.EmailAddress("mailto:#{c.email_address}")
+        end
+        root.TelephoneNumber(c.telephone_number) if c.telephone_number.present?
       end
     end
 
     def role_descriptor(rd, scope)
       scope.parent[:protocolSupportEnumeration] =
         rd.protocol_supports.map(&:uri).join(',')
-      scope.parent[:errorURL] = rd.error_url if rd.error_url
+      scope.parent[:errorURL] = rd.error_url if rd.error_url.present?
 
       role_descriptor_extensions(rd, scope)
 

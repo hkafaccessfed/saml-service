@@ -85,4 +85,16 @@ describe SSODescriptor do
       end
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :sso_descriptor, :with_artifact_resolution_services,
+             :with_single_logout_services, :with_manage_name_id_services,
+             :with_name_id_formats
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

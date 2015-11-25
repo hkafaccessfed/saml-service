@@ -88,4 +88,18 @@ RSpec.describe AttributeAuthorityDescriptor, type: :model do
       end
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :attribute_authority_descriptor, :with_multiple_attribute_services,
+             :with_multiple_assertion_id_request_services,
+             :with_multiple_name_id_formats,
+             :with_multiple_attribute_profiles,
+             :with_multiple_attributes
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

@@ -1,8 +1,11 @@
 class KeyDescriptor < Sequel::Model
-  many_to_one :key_info
+  one_to_one :key_info
   one_to_many :encryption_method
 
   many_to_one :role_descriptor
+
+  plugin :association_dependencies, key_info: :destroy,
+                                    encryption_method: :destroy
 
   KEY_TYPE = { encryption: 1, signing: 2 }
 

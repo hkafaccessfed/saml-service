@@ -76,4 +76,18 @@ describe SPSSODescriptor do
       end
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :sp_sso_descriptor, :with_authn_requests_signed,
+             :with_want_assertions_signed,
+             :request_attributes,
+             :with_attribute_consuming_services,
+             :with_ui_info, :with_discovery_response_services
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

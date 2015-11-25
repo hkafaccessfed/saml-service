@@ -7,6 +7,13 @@ class IDPSSODescriptor < SSODescriptor
 
   one_to_one :disco_hints, class: 'MDUI::DiscoHints'
 
+  plugin :association_dependencies, single_sign_on_services: :destroy,
+                                    name_id_mapping_services: :destroy,
+                                    assertion_id_request_services: :destroy,
+                                    attribute_profiles: :destroy,
+                                    attributes: :destroy,
+                                    disco_hints: :destroy
+
   def validate
     super
     validates_presence [:want_authn_requests_signed]

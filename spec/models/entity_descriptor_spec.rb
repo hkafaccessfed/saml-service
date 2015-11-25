@@ -221,4 +221,17 @@ describe EntityDescriptor do
       end
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :entity_descriptor, :with_technical_contact,
+             :with_publication_info, :with_entity_attribute,
+             :with_refeds_rs_entity_category,
+             :with_idp, :with_sp, :with_aa
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

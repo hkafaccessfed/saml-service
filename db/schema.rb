@@ -58,17 +58,6 @@ Sequel.migration do
       column :index, "int(11)", :null=>false
     end
     
-    create_table(:key_infos) do
-      primary_key :id, :type=>"int(11)"
-      column :data, "text", :null=>false
-      column :subject, "varchar(255)"
-      column :issuer, "varchar(255)"
-      column :key_name, "varchar(255)"
-      column :expiry, "datetime"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-    end
-    
     create_table(:keypairs) do
       primary_key :id, :type=>"int(11)"
       column :certificate, "varchar(4096)", :null=>false
@@ -465,14 +454,12 @@ Sequel.migration do
     
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
       column :key_type_id, "int(11)", :null=>false
       column :disabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       
-      index [:key_info_id], :name=>:key_info_id_fkey
       index [:role_descriptor_id], :name=>:rd_kd_fkey
     end
     
@@ -636,6 +623,20 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:disco_hints_id], :name=>:ip_disco_hints_fkey
+    end
+    
+    create_table(:key_infos) do
+      primary_key :id, :type=>"int(11)"
+      column :data, "text", :null=>false
+      column :subject, "varchar(255)"
+      column :issuer, "varchar(255)"
+      column :key_name, "varchar(255)"
+      column :expiry, "datetime"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :key_descriptor_id, :key_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:key_descriptor_id], :name=>:key_descriptor_id
     end
     
     create_table(:keyword_lists) do
@@ -835,5 +836,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_cr
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151116230223_add_fingerprint_to_keypairs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151117041822_add_unique_key_to_metadata_instance_primary_tag.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151123000127_alter_kd_to_ki_relationship.rb')"
                 end
               end

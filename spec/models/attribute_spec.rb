@@ -41,4 +41,14 @@ describe Attribute do
       expect(subject).not_to be_valid
     end
   end
+
+  describe '#destroy' do
+    subject do
+      create :attribute, :with_values
+    end
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

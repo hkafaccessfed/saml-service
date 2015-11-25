@@ -4,7 +4,7 @@ class KeyInfo < Sequel::Model
 
   plugin :class_table_inheritance
 
-  one_to_one :key_descriptor
+  many_to_one :key_descriptor
 
   # Strictly this model should be
   # KeyInfo has_a Certificate

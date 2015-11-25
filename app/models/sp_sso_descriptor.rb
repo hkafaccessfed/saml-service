@@ -3,6 +3,10 @@ class SPSSODescriptor < SSODescriptor
   one_to_many :attribute_consuming_services
   one_to_many :discovery_response_services
 
+  plugin :association_dependencies, assertion_consumer_services: :destroy,
+                                    attribute_consuming_services: :destroy,
+                                    discovery_response_services: :destroy
+
   def validate
     super
     validates_presence [:authn_requests_signed, :want_assertions_signed]

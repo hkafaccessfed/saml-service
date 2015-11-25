@@ -40,9 +40,7 @@ module MetadataQueryCaching
     Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
       @saml_renderer.root_entity_descriptor(known_entity)
       validate_xml
-      @saml_renderer.sign
-
-      { expires: cache_expiry, metadata: @saml_renderer.builder.to_xml }
+      { expires: cache_expiry, metadata: @saml_renderer.sign }
     end
   end
 
@@ -53,9 +51,7 @@ module MetadataQueryCaching
     Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
       @saml_renderer.entities_descriptor(known_entities)
       validate_xml
-      @saml_renderer.sign
-
-      { expires: cache_expiry, metadata: @saml_renderer.builder.to_xml }
+      { expires: cache_expiry, metadata: @saml_renderer.sign }
     end
   end
 

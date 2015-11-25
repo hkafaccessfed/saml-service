@@ -21,8 +21,20 @@ RSpec.shared_examples 'ds:KeyInfo xml' do
       end
     end
     context 'is not set' do
-      it 'is not created' do
-        expect(xml).not_to have_xpath(key_name_path)
+      context 'is blank' do
+        let(:key_info) { create :key_info, key_name: '' }
+
+        it 'is not created' do
+          expect(xml).not_to have_xpath(key_name_path)
+        end
+      end
+
+      context 'is nil' do
+        let(:key_info) { create :key_info, key_name: nil }
+
+        it 'is not created' do
+          expect(xml).not_to have_xpath(key_name_path)
+        end
       end
     end
   end

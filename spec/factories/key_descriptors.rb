@@ -1,7 +1,10 @@
 FactoryGirl.define do
   factory :key_descriptor do
     disabled { false }
-    key_info
+
+    after :create do |kd|
+      create :key_info, key_descriptor: kd
+    end
 
     trait :signing do
       key_type :signing

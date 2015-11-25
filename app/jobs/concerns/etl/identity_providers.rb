@@ -5,6 +5,8 @@ module ETL
     def identity_providers(ed, ed_data)
       ed_data[:saml][:identity_providers].each do |idp_ref|
         idp_data = fr_identity_providers[idp_ref[:id]]
+        next unless idp_data[:saml][:single_sign_on_services].count > 0
+        next if idp_data[:attribute_authority_only]
 
         create_or_update_idp(ed, IDPSSODescriptor.dataset, idp_data)
       end

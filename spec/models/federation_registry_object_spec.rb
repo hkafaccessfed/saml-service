@@ -12,7 +12,8 @@ RSpec.describe FederationRegistryObject do
 
     context 'valid input' do
       let(:instance) do
-        FederationRegistryObject.local_instance(fr_id, idp.class.name)
+        FederationRegistryObject
+          .local_instance(fr_id, IDPSSODescriptor.dataset)
       end
       it 'supplies expected instance' do
         expect(instance).to eq(idp)
@@ -22,7 +23,8 @@ RSpec.describe FederationRegistryObject do
     context 'invalid input' do
       context 'FR ID not locally stored' do
         let(:instance) do
-          FederationRegistryObject.local_instance(fr_id + 1, idp.class.name)
+          FederationRegistryObject
+            .local_instance(fr_id + 1, IDPSSODescriptor.dataset)
         end
         it 'fails' do
           expect(instance).to be_nil
@@ -30,9 +32,9 @@ RSpec.describe FederationRegistryObject do
       end
 
       context 'FR ID not locally stored' do
-        let(:class_name) { Faker::Lorem.word }
         let(:instance) do
-          FederationRegistryObject.local_instance(fr_id, class_name)
+          FederationRegistryObject
+            .local_instance(201, IDPSSODescriptor.dataset)
         end
         it 'fails' do
           expect(instance).to be_nil
