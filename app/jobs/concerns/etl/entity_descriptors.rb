@@ -3,7 +3,13 @@ module ETL
     def entity_descriptors(o, org_data)
       org_data[:saml][:entity_descriptors].each do |ed_ref|
         ed_data = fr_entity_descriptors[ed_ref[:id]]
-        create_or_update_ed(o, EntityDescriptor.dataset, ed_data)
+
+        begin
+          create_or_update_ed(o, EntityDescriptor.dataset, ed_data)
+        rescue Sequel::ValidationFailed => e
+          Rails.logger.error "Evicted FR entity #{ed_data[:entity_id]}"
+          Rails.logger.error e
+        end
       end
     end
 
