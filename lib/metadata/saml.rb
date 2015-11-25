@@ -156,7 +156,7 @@ module Metadata
 
     def key_info(ki)
       ds.KeyInfo(ns) do |_|
-        ds.KeyName ki.key_name if ki.key_name
+        ds.KeyName ki.key_name if ki.key_name.present?
         ds.X509Data do |_|
           ds.X509SubjectName ki.subject if ki.subject
           ds.X509Certificate ki.certificate_without_anchors
