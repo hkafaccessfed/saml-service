@@ -100,13 +100,17 @@ RSpec.shared_examples 'ds:Signature xml' do
     let!(:raw_xml) { subject.sign }
 
     let(:c14n_xml) do
-      doc = builder.doc.dup
+      document = builder.doc.to_xml(indent: 2)
+      doc =
+        Nokogiri::XML(document, nil, nil, Nokogiri::XML::ParseOptions::STRICT)
       doc.xpath('//ds:Signature').each(&:remove)
       doc.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end
 
     let(:c14n_signed_info) do
-      doc = builder.doc.dup
+      doc =
+        Nokogiri::XML(raw_xml, nil, nil, Nokogiri::XML::ParseOptions::STRICT)
+
       doc.at_xpath("#{doc_sig_xpath}/ds:SignedInfo")
         .canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end

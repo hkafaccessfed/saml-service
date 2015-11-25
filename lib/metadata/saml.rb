@@ -46,7 +46,7 @@ module Metadata
     end
 
     def sign
-      Xmldsig::SignedDocument.new(builder.doc).sign(key)
+      Xmldsig::SignedDocument.new(builder.doc.to_xml(indent: 2)).sign(key)
     end
 
     def entities_descriptor(known_entities)
