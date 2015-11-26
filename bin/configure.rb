@@ -7,6 +7,11 @@ class ConfigureCLI < Thor
   desc 'fr_source [options...]', 'Create or update a Federation Registry source'
   option :hostname, desc: 'The hostname of the Federation Registry instance'
   option :secret, desc: 'The export secret configured in Federation Registry'
+  option :registration_authority,
+         desc: 'The URI for MDRPI::RegistrationInfo/@registrationAuthority'
+  option :registration_policy,
+         desc: 'The URI for MDRPI::RegistrationInfo/RegistrationPolicy'
+  option :lang, desc: 'The specified language for any localised elements'
   long_desc <<-LONGDESC
     Configures the SAML Service to sync to an upstream Federation Registry using
     the Export API.
@@ -19,6 +24,8 @@ class ConfigureCLI < Thor
     fail('Multiple FederationRegistrySource objects exist') if other
 
     source ||= new_federation_registry_source
+
+    update_registration_info(source)
     source.update(options.slice(:hostname, :secret))
   end
 
@@ -74,12 +81,13 @@ class ConfigureCLI < Thor
   def new_federation_registry_source
     FederationRegistrySource.new do |source|
       source.entity_source = EntitySource.create(active: true, rank: 10)
-
-      hostname = options[:hostname]
-      source.registration_authority = "https://#{hostname}/federationregistry/"
-      source.registration_policy_uri = "https://#{hostname}/federationregistry/"
-      source.registration_policy_uri_lang = 'en'
     end
+  end
+
+  def update_registration_info(source)
+    source.registration_authority = options[:registration_authority]
+    source.registration_policy_uri = options[:registration_policy]
+    source.registration_policy_uri_lang = options[:lang]
   end
 
   def load_keypair
@@ -101,11 +109,9 @@ class ConfigureCLI < Thor
 
     keypair || fail('The provided certificate has not been registered')
 
-    {
-      name: opts[:name], federation_identifier: opts[:tag],
+    { name: opts[:name], federation_identifier: opts[:tag],
       hash_algorithm: opts[:hash].downcase, validity_period: 7.days,
-      keypair_id: keypair.id, all_entities: true
-    }
+      keypair_id: keypair.id, all_entities: true }
   end
 
   def update_publication_info(instance)

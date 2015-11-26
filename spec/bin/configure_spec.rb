@@ -3,17 +3,29 @@ require_relative '../../bin/configure'
 
 RSpec.describe ConfigureCLI do
   describe '#fr_source' do
-    def run(hostname, secret)
-      ConfigureCLI.start(['fr_source',
-                          '--hostname', hostname,
-                          '--secret', secret])
+    let(:hostname) { Faker::Internet.domain_name }
+    let(:secret) { SecureRandom.urlsafe_base64 }
+    let(:registration_authority) { Faker::Internet.domain_name }
+    let(:registration_policy) { Faker::Internet.domain_name }
+    let(:lang) { Faker::Lorem.word }
+
+    def run(**overrides)
+      args = overrides.reverse_merge(
+        hostname: hostname,
+        secret: secret,
+        registration_authority: registration_authority,
+        registration_policy: registration_policy,
+        lang: lang
+      ).transform_keys { |sym| "--#{sym.to_s.dasherize}" }.to_a.flatten
+
+      ConfigureCLI.start(['fr_source', *args])
     end
 
     context 'when multiple sources exist' do
       let!(:fr_sources) { create_list(:federation_registry_source, 2) }
 
       it 'raises an error' do
-        expect { run('a', 'b') }
+        expect { run }
           .to raise_error('Multiple FederationRegistrySource objects exist')
       end
     end
@@ -23,39 +35,50 @@ RSpec.describe ConfigureCLI do
 
       it 'updates the secret' do
         new_secret = SecureRandom.urlsafe_base64
-        expect { run(fr_source.hostname, new_secret) }
+        expect { run(secret: new_secret) }
           .to change { fr_source.reload.secret }.to(new_secret)
       end
 
       it 'updates the hostname' do
         new_hostname = "manager.#{Faker::Internet.domain_name}"
-        expect { run(new_hostname, fr_source.secret) }
+        expect { run(hostname: new_hostname) }
           .to change { fr_source.reload.hostname }.to(new_hostname)
+      end
+
+      it 'updates the registration authority' do
+        new_registration_authority = Faker::Internet.url
+        expect { run(registration_authority: new_registration_authority) }
+          .to change { fr_source.reload.registration_authority }
+          .to(new_registration_authority)
+      end
+
+      it 'updates the registration policy' do
+        new_registration_policy = Faker::Internet.url
+        expect { run(registration_policy: new_registration_policy) }
+          .to change { fr_source.reload.registration_policy_uri }
+          .to(new_registration_policy)
       end
     end
 
     context 'when no source exists' do
-      let(:hostname) { Faker::Internet.domain_name }
-      let(:secret) { SecureRandom.urlsafe_base64 }
-
       it 'creates a new source' do
-        expect { run(hostname, secret) }
+        expect { run }
           .to change(FederationRegistrySource, :count).by(1)
       end
 
       it 'creates an active EntitySource' do
-        expect { run(hostname, secret) }
+        expect { run }
           .to change(EntitySource, :count).by(1)
 
         expect(EntitySource.last).to have_attributes(active: true, rank: 10)
       end
 
       it 'sets the correct registration attributes on the new source' do
-        run(hostname, secret)
+        run
         expected = {
-          registration_authority: "https://#{hostname}/federationregistry/",
-          registration_policy_uri: "https://#{hostname}/federationregistry/",
-          registration_policy_uri_lang: 'en'
+          registration_authority: registration_authority,
+          registration_policy_uri: registration_policy,
+          registration_policy_uri_lang: lang
         }
         expect(FederationRegistrySource.last).to have_attributes(expected)
       end
