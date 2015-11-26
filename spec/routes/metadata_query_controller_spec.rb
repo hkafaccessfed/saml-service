@@ -7,7 +7,7 @@ RSpec.describe 'Routes for MetadataQueryController', type: :routing do
   let(:basic_identifier) { Faker::Lorem.word }
 
   it 'routes /:primary_tag/entities to #all_entities' do
-    expect(get("/#{primary_tag}/entities"))
+    expect(get("/mdq/#{primary_tag}/entities"))
       .to route_to(
         controller: 'metadata_query',
         action: 'all_entities',
@@ -16,7 +16,7 @@ RSpec.describe 'Routes for MetadataQueryController', type: :routing do
   end
 
   it 'routes /:primary_tag/entities/:identifier to #specific_entity' do
-    expect(get("/#{primary_tag}/entities/#{identifier}"))
+    expect(get("/mdq/#{primary_tag}/entities/#{identifier}"))
       .to route_to(
         controller: 'metadata_query',
         action: 'specific_entity',
@@ -26,7 +26,7 @@ RSpec.describe 'Routes for MetadataQueryController', type: :routing do
   end
 
   it 'routes /:primary_tag/entities/:identifier to #specific_entity_sha1' do
-    uri = URI.encode("/#{primary_tag}/entities/{sha1}#{sha1_identifier}")
+    uri = URI.encode("/mdq/#{primary_tag}/entities/{sha1}#{sha1_identifier}")
     expect(get(uri))
       .to route_to(
         controller: 'metadata_query',
@@ -37,7 +37,7 @@ RSpec.describe 'Routes for MetadataQueryController', type: :routing do
   end
 
   it 'routes /:primary_tag/entities/:basic_identifier to #tagged_entities' do
-    expect(get("/#{primary_tag}/entities/#{basic_identifier}"))
+    expect(get("/mdq/#{primary_tag}/entities/#{basic_identifier}"))
       .to route_to(
         controller: 'metadata_query',
         action: 'tagged_entities',
