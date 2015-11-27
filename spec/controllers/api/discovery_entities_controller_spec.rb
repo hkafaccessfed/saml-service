@@ -30,9 +30,25 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
         .and not_include(service_provider)
     end
 
+    context 'for a disabled identity provider' do
+      let!(:identity_provider) { create(:entity_descriptor, enabled: false) }
+
+      it 'excludes the identity provider' do
+        expect(assigns[:identity_providers]).not_to include(identity_provider)
+      end
+    end
+
     it 'assigns the service providers' do
       expect(assigns[:service_providers]).to include(service_provider)
         .and not_include(identity_provider)
+    end
+
+    context 'for a disabled service provider' do
+      let!(:service_provider) { create(:entity_descriptor, enabled: false) }
+
+      it 'excludes the service provider' do
+        expect(assigns[:service_providers]).not_to include(service_provider)
+      end
     end
 
     context 'with no permissions' do
