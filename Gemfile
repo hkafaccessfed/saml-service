@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 # Core
 gem 'rails', '~> 4.2'
-gem 'mysql2', '0.3.20'
+gem 'mysql2', '0.4.2'
 gem 'sequel-rails'
 # TODO: sequel >= 4.24 causes mass test failures, unpin this and fix the problem
 gem 'sequel', '~> 4.23.0'
@@ -58,4 +58,7 @@ group :development, :test do
   gem 'guard-brakeman', require: false
   gem 'pry-rails'
   gem 'pry-byebug'
+
+  gem 'derailed'
+  gem 'stackprof'
 end
