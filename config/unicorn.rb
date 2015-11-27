@@ -7,6 +7,8 @@ stdout_path '/var/log/aaf/saml/unicorn/stdout.log'
 stderr_path '/var/log/aaf/saml/unicorn/stderr.log'
 
 before_fork do |server, _worker|
+  Sequel::Model.db.disconnect
+
   old_pid = File.join(ROOT, 'tmp', 'pids', 'unicorn.pid.oldbin')
   if File.exist?(old_pid) && server.pid != old_pid
     begin
