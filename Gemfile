@@ -58,7 +58,4 @@ group :development, :test do
   gem 'guard-brakeman', require: false
   gem 'pry-rails'
   gem 'pry-byebug'
-
-  gem 'derailed'
-  gem 'stackprof'
 end
