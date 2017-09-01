@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MDRPI
   class RegistrationInfo < Sequel::Model
     include Parents
@@ -11,11 +13,11 @@ module MDRPI
 
     def validate
       super
-      validates_presence [:registration_authority, :created_at, :updated_at]
+      validates_presence %i[registration_authority created_at updated_at]
 
       return if new?
       validates_presence :registration_policies
-      single_parent [:metadata_instance, :entity_descriptor]
+      single_parent %i[metadata_instance entity_descriptor]
     end
 
     def registration_instant_utc

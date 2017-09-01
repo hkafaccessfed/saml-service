@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'mdui:UIInfo xml' do
   let(:mdui_ui_info_path) { '/mdui:UIInfo' }
   let(:mdui_display_name_path) { "#{mdui_ui_info_path}/mdui:DisplayName" }

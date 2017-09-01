@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe UpdateEntitySource do
@@ -29,8 +31,8 @@ RSpec.describe UpdateEntitySource do
   def entity_descriptors(entities:, type:)
     fragments = (1..entities).map do
       attributes_for(type)[:xml]
-      .gsub('xmlns="urn:oasis:names:tc:SAML:2.0:metadata"', '')
-      .strip
+        .gsub('xmlns="urn:oasis:names:tc:SAML:2.0:metadata"', '')
+        .strip
     end
     fragments.join("\n")
   end
@@ -207,7 +209,7 @@ RSpec.describe UpdateEntitySource do
         it 'modifies KnownEntity updated_at' do
           Timecop.travel(1.second) do
             expect { run }
-              .to change { red.reload.known_entity.updated_at }
+              .to(change { red.reload.known_entity.updated_at })
           end
         end
 
@@ -223,7 +225,7 @@ RSpec.describe UpdateEntitySource do
 
           before do
             additional_entity_reference.raw_entity_descriptor
-              .entity_id.update(uri: entity_id)
+                                       .entity_id.update(uri: entity_id)
           end
 
           it 'results in two references for the same entity_id' do
@@ -233,10 +235,10 @@ RSpec.describe UpdateEntitySource do
           it 'has differing sources for each EntityId reference' do
             es1 =
               EntityId.where(uri: entity_id).first.parent
-              .known_entity.entity_source
+                      .known_entity.entity_source
             es2 =
               EntityId.where(uri: entity_id).last.parent
-              .known_entity.entity_source
+                      .known_entity.entity_source
 
             expect(es1 == es2).to be_falsey
           end
@@ -244,14 +246,14 @@ RSpec.describe UpdateEntitySource do
           it 'updates the known_entity for this source' do
             Timecop.travel(1.second) do
               expect { run }
-                .to change { red.reload.known_entity.updated_at }
+                .to(change { red.reload.known_entity.updated_at })
             end
           end
 
           it 'does not update other known_entity instances' do
             Timecop.travel(1.second) do
-              expect { run }
-                .not_to change { additional_entity_reference.reload.updated_at }
+              other = additional_entity_reference
+              expect { run }.not_to(change { other.reload.updated_at })
             end
           end
         end
@@ -263,8 +265,11 @@ RSpec.describe UpdateEntitySource do
     let(:xml) { entities_descriptor(entities: 3) }
 
     it 'creates the raw entity descriptors' do
-      expect { run }.to change { subject.known_entities(true).count }.by(3)
-        .and change(RawEntityDescriptor, :count).by(3)
+      expect { run }.to(
+        change { subject.known_entities(true).count }
+          .by(3)
+          .and(change(RawEntityDescriptor, :count).by(3))
+      )
     end
 
     it 'uses the correct entity id' do
@@ -348,7 +353,7 @@ RSpec.describe UpdateEntitySource do
 
     it 'creates no records' do
       expect { swallow { run } }
-        .not_to change { KnownEntity.count + RawEntityDescriptor.count }
+        .not_to(change { KnownEntity.count + RawEntityDescriptor.count })
     end
 
     it 'raises an informative exception' do
@@ -356,7 +361,6 @@ RSpec.describe UpdateEntitySource do
       expect(@exception.message)
         .to match(/Unable to update EntitySource/)
         .and match(subject.url)
-        .and match(/Schema validation errors prevented processing/)
         .and match(/Element.*EntityDescriptor.*entityID.*is required/)
     end
   end
@@ -373,8 +377,11 @@ RSpec.describe UpdateEntitySource do
     end
 
     it 'creates the entity record' do
-      expect { run }.to change { subject.known_entities(true).count }.by(1)
-        .and change(RawEntityDescriptor, :count).by(1)
+      expect { run }.to(
+        change { subject.known_entities(true).count }
+          .by(1)
+          .and(change(RawEntityDescriptor, :count).by(1))
+      )
     end
   end
 
@@ -398,9 +405,8 @@ RSpec.describe UpdateEntitySource do
     it 'raises an informative message' do
       swallow { run }
       expect(@exception.message)
-        .to match('Unable to update EntitySource')
-        .and match(subject.url)
-        .and match('Signature validation failed')
+        .to match("Signature invalid on EntitySource(id=#{subject.id} " \
+                  "url=#{subject.url}).")
     end
   end
 

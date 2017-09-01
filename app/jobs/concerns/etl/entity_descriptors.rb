@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ETL
   module EntityDescriptors
     def entity_descriptors(o, org_data)
@@ -46,7 +48,7 @@ module ETL
     end
 
     def ed_attrs(ed_data)
-      { created_at: Time.parse(ed_data[:created_at]),
+      { created_at: Time.zone.parse(ed_data[:created_at]),
         enabled: ed_data[:functioning] }
     end
 
@@ -60,13 +62,19 @@ module ETL
 
       ri = MDRPI::RegistrationInfo.create(
         registration_authority: @fr_source.registration_authority,
-        registration_instant: Time.parse(ed_data[:created_at]),
-        entity_descriptor: ed)
+        registration_instant: Time.zone.parse(ed_data[:created_at]),
+        entity_descriptor: ed
+      )
 
+      create_registration_info(ri)
+    end
+
+    def create_registration_info(ri)
       MDRPI::RegistrationPolicy.create(
         registration_info: ri,
         uri: @fr_source.registration_policy_uri,
-        lang: @fr_source.registration_policy_uri_lang)
+        lang: @fr_source.registration_policy_uri_lang
+      )
     end
 
     def indicate_content_updated(ke)
@@ -80,7 +88,7 @@ module ETL
         FederationRegistryObject.local_instance(ed_data[:id],
                                                 EntityDescriptor.dataset)
 
-      return unless ed.present?
+      return if ed.blank?
 
       Rails.logger.info "Destroying FR entity #{ed_data[:entity_id]}"
       ed.destroy

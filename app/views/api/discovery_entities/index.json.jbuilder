@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 json.ignore_nil!
 
 def insert_localized_url(json, obj)
@@ -31,7 +33,7 @@ end
 def insert_discovery_response_endpoints(json, obj)
   dre =
     obj.try(:sp_sso_descriptors).try(:first)
-    .try(:discovery_response_services) ||
+       .try(:discovery_response_services) ||
     obj.try(:discovery_response_services) ||
     []
 
@@ -50,13 +52,13 @@ end
 def insert_single_sign_on_soap_endpoints(json, obj)
   se =
     obj.try(:idp_sso_descriptors).try(:first)
-    .try(:single_sign_on_services) ||
+       .try(:single_sign_on_services) ||
     obj.try(:single_sign_on_services) ||
     []
 
   sso_soap_endpoints =
     se.select { |e| e.binding == 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP' }
-    .sort_by(&:id).map(&:location)
+      .sort_by(&:id).map(&:location)
 
   json.soap(sso_soap_endpoints)
 end

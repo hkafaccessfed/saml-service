@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
   context 'MDRPI Registation Info' do
     let(:registration_info_path) { '/mdrpi:RegistrationInfo' }

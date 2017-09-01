@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.shared_examples 'SAML namespaces' do
@@ -14,9 +16,9 @@ RSpec.shared_examples 'SAML namespaces' do
     it { is_expected.to respond_to(:ds) }
     it { is_expected.to respond_to(:ns) }
 
-    it 'has 11 namespaces defined' do
-      expect(subject.ns.size).to eq(11)
-      expect(Metadata::SAMLNamespaces::NAMESPACES.size).to eq(11)
+    it 'has 12 namespaces defined' do
+      expect(subject.ns.size).to eq(12)
+      expect(Metadata::SAMLNamespaces::NAMESPACES.size).to eq(12)
     end
 
     let(:ns) { subject.ns }
@@ -54,6 +56,9 @@ RSpec.shared_examples 'SAML namespaces' do
     end
     it 'supports SAML 2.0 assertion' do
       expect(ns['xmlns:privacy']).to eq('http://docs.oasis-open.org/wsfed/privacy/200706')
+    end
+    it 'supports REFEDS metadata extension schema' do
+      expect(ns['xmlns:remd']).to eq('http://refeds.org/metadata')
     end
   end
 end

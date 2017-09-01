@@ -1,32 +1,49 @@
+# frozen_string_literal: true
+
+guard 'brakeman', run_on_start: true do
+  watch(%r{^app/.+\.(erb|rb)$})
+  watch(%r{^config/.+\.rb$})
+  watch(%r{^lib/.+\.rb$})
+  watch('Gemfile')
+end
+
 guard :bundler do
   watch('Gemfile')
 end
 
 guard :rspec, cmd: 'bundle exec rspec' do
-  watch('spec/spec_helper.rb')                        { "spec" }
-  watch('config/routes.rb')                           { "spec/routing" }
-  watch('app/controllers/application_controller.rb')  { "spec/controllers" }
-  watch(%r{^spec/factories/(.+)\.rb$})                { "spec/support/factories_spec.rb" }
+  require 'guard/rspec/dsl'
+  dsl = Guard::RSpec::Dsl.new(self)
 
-  watch(%r{^spec/.+_spec\.rb$})
-  watch(%r{^spec/support/metadata/.+\.rb$})           { 'spec/metadata' }
-  watch(%r{^spec/support/jobs/.+\.rb$})               { 'spec/jobs' }
-  watch(%r{^(bin/.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
-  watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
-  watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
-  watch(%r{^app/(.*)(\.erb|\.haml|\.slim)$})          { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
-  watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/lib/#{m[1]}_spec.rb" }
-  watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance/#{m[1]}_spec.rb"] }
+  rspec = dsl.rspec
+  watch(rspec.spec_helper) { rspec.spec_dir }
+  watch(rspec.spec_support) { rspec.spec_dir }
+  watch(rspec.spec_files)
+
+  ruby = dsl.ruby
+  dsl.watch_spec_files_for(ruby.lib_files)
+
+  rails = dsl.rails(view_extensions: %w[erb haml slim])
+  dsl.watch_spec_files_for(rails.app_files)
+  dsl.watch_spec_files_for(rails.views)
+
+  watch(rails.controllers) do |m|
+    [
+      rspec.spec.call("routing/#{m[1]}_routing"),
+      rspec.spec.call("controllers/#{m[1]}_controller"),
+      rspec.spec.call("acceptance/#{m[1]}")
+    ]
+  end
+
+  watch(rails.spec_helper)     { rspec.spec_dir }
+  watch(rails.routes)          { "#{rspec.spec_dir}/routing" }
+  watch(rails.app_controller)  { "#{rspec.spec_dir}/controllers" }
+
+  watch(rails.view_dirs)     { |m| rspec.spec.call("features/#{m[1]}") }
+  watch(rails.layouts)       { |m| rspec.spec.call("features/#{m[1]}") }
 end
 
 guard :rubocop do
-  watch(%r{.+\.rb$})
-  watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
-end
-
-guard :brakeman, quiet: true do
-  watch(%r{^app/.+\.(erb|haml|rhtml|rb)$})
-  watch(%r{^config/.+\.rb$})
-  watch(%r{^lib/.+\.rb$})
-  watch('Gemfile')
+  watch(/.+\.rb$/)
+  watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
 end

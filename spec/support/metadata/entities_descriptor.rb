@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'EntitiesDescriptor xml' do
   let(:add_ca_keys) { false }
   let(:add_registration_info) { false }

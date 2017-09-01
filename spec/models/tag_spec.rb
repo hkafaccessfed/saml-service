@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
@@ -43,7 +45,28 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it 'is expected to be a uniqueness validation' do
         expect(subject)
-          .to eq([:name, :known_entity] => ['is already taken'])
+          .to eq(%i[name known_entity] => ['is already taken'])
+      end
+    end
+  end
+
+  describe '#name' do
+    let(:tag) { build(:tag, name: tag_name) }
+    before { tag.valid? }
+    subject { tag }
+
+    context 'using url-safe base64 alphabet' do
+      let(:tag_name) { SecureRandom.urlsafe_base64 }
+      it { is_expected.to be_valid }
+    end
+
+    context 'not using url-safe base64 alphabet' do
+      let(:tag_name) { '@*!' }
+      it { is_expected.to_not be_valid }
+
+      context 'the errors' do
+        subject { tag.errors }
+        it { is_expected.to eq(name: ['is not in base64 urlsafe alphabet']) }
       end
     end
   end

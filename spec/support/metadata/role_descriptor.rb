@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'RoleDescriptor xml' do
   let(:extensions_path) { "#{role_descriptor_path}/Extensions" }
   let(:test_extensions_path) { "#{extensions_path}/some-node" }

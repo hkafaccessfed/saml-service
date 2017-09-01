@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AttributeConsumingService < Sequel::Model
   many_to_one :sp_sso_descriptor
   one_to_many :service_names
@@ -10,7 +12,7 @@ class AttributeConsumingService < Sequel::Model
 
   def validate
     super
-    validates_presence [:created_at, :updated_at]
+    validates_presence %i[created_at updated_at]
     validates_presence :index
     validates_presence :default
     validates_presence :sp_sso_descriptor

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'SPSSODescriptor xml' do
   let(:assertion_consumer_service_path) do
     "#{sp_sso_descriptor_path}/AssertionConsumerService"
@@ -19,32 +21,14 @@ RSpec.shared_examples 'SPSSODescriptor xml' do
     let(:node) { xml.first(:xpath, sp_sso_descriptor_path) }
 
     context 'AuthnRequestsSigned' do
-      it 'is rendered' do
-        expect(node['AuthnRequestsSigned']).to be_truthy
-      end
-      context 'when explicitly set' do
-        let(:sp_sso_descriptor) do
-          create :sp_sso_descriptor, :with_authn_requests_signed
-        end
-        it 'is rendered' do
-          expect(node['AuthnRequestsSigned'])
-            .to eq(sp_sso_descriptor.authn_requests_signed.to_s)
-        end
+      it 'is not rendered' do
+        expect(node['AuthnRequestsSigned']).to be_falsey
       end
     end
 
     context 'WantAssertionsSigned' do
-      it 'is rendered' do
-        expect(node['WantAssertionsSigned']).to be_truthy
-      end
-      context 'when explicitly set' do
-        let(:sp_sso_descriptor) do
-          create :sp_sso_descriptor, :with_want_assertions_signed
-        end
-        it 'is rendered' do
-          expect(node['WantAssertionsSigned'])
-            .to eq(sp_sso_descriptor.want_assertions_signed.to_s)
-        end
+      it 'is not rendered' do
+        expect(node['WantAssertionsSigned']).to be_falsey
       end
     end
   end

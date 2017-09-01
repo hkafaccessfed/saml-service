@@ -1,8 +1,14 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::IdentityProviders' do
   include_examples 'ETL::Common'
 
   # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_json(idp)
+    contact_people =
+      contact_instances.map { |cp| contact_person_json(cp) } +
+      sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+
     {
       id: idp.id,
       display_name: Faker::Lorem.sentence,
@@ -28,9 +34,8 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
               idp.protocol_supports.map { |pse| saml_uri_json(pse) },
             key_descriptors:
               idp.key_descriptors.map { |kd| key_descriptor_json(kd) }
-                .push(bad_key_descriptor_json),
-            contact_people:
-              contact_instances.map { |cp| contact_person_json(cp) },
+                 .push(bad_key_descriptor_json),
+            contact_people: contact_people,
             error_url: idp.error_url
           },
           name_id_formats:
@@ -74,7 +79,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
   def run
     described_class.new(id: fr_source.id)
-      .identity_providers(entity_descriptor, ed_data)
+                   .identity_providers(entity_descriptor, ed_data)
   end
 
   let(:identity_provider_instances) do
@@ -99,7 +104,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
   let(:identity_providers) { identity_providers_list }
 
-  let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:idp_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
 
   let(:attribute_instances) do
     (0..attribute_count).map do |i|
@@ -132,7 +137,9 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
   before do
     stub_fr_request(:contacts)
-    contact_instances.each { |c| fr_object(Contact.name, c.id) }
+
+    [*contact_instances, *sirtfi_contact_instances]
+      .each { |c| fr_object(Contact.name, c.id) }
 
     stub_fr_request(:attributes)
     stub_fr_request(:identity_providers)
@@ -142,6 +149,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     let(:source_idp) { identity_provider_instances.first }
     let(:idp_count) { 1 }
     let(:contact_count) { 1 }
+    let(:sirtfi_contact_count) { 1 }
     let(:attribute_count) { 3 }
 
     subject { IDPSSODescriptor.last }
@@ -245,6 +253,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
           let(:source) do
             identity_providers
               .first[:saml][:sso_descriptor][:role_descriptor][:contact_people]
+              .reject { |cp| cp.dig(:type, :name) == 'Security' }
           end
         end
       end
@@ -283,6 +292,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     let(:source_idp) { identity_provider_instances.first }
     let(:idp_count) { 1 }
     let(:contact_count) { 1 }
+    let(:sirtfi_contact_count) { 1 }
     let(:attribute_count) { 3 }
 
     subject { IDPSSODescriptor.last }
@@ -293,32 +303,32 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     include_examples 'updating MDUI content'
 
     it 'uses the existing instance' do
-      expect { run }.not_to change { IDPSSODescriptor.count }
+      expect { run }.not_to(change { IDPSSODescriptor.count })
     end
 
     it 'does not create more tags' do
-      expect { run }.not_to change { Tag.count }
+      expect { run }.not_to(change { Tag.count })
     end
 
     it 'updates single sign on services' do
-      expect { run }.to change { subject.reload.single_sign_on_services }
+      expect { run }.to(change { subject.reload.single_sign_on_services })
     end
 
     it 'updates name id mapping services' do
-      expect { run }.to change { subject.reload.name_id_mapping_services }
+      expect { run }.to(change { subject.reload.name_id_mapping_services })
     end
 
     it 'updates assertion id request services' do
       expect { run }
-        .to change { subject.reload.assertion_id_request_services }
+        .to(change { subject.reload.assertion_id_request_services })
     end
 
     it 'updates attribute profiles' do
-      expect { run }.to change { subject.reload.attribute_profiles }
+      expect { run }.to(change { subject.reload.attribute_profiles })
     end
 
     it 'updates attributes' do
-      expect { run }.to change { subject.reload.attributes }
+      expect { run }.to(change { subject.reload.attributes })
     end
   end
 end

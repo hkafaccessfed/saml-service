@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Role < Sequel::Model
   one_to_many :permissions
   many_to_many :api_subjects, class: 'API::APISubject'

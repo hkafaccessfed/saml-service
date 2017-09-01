@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :metadata_instance do
     association :keypair
@@ -10,6 +12,7 @@ FactoryGirl.define do
     federation_identifier { Faker::Lorem.word }
 
     primary_tag { SecureRandom.urlsafe_base64(16) }
+    identifier { SecureRandom.urlsafe_base64(16) }
     all_entities true
 
     after :create do |mi|

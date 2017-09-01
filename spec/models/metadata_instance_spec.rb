@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe MetadataInstance do
@@ -9,13 +11,14 @@ describe MetadataInstance do
   it { is_expected.to validate_presence :name }
   it { is_expected.not_to validate_presence :publication_info }
   it { is_expected.to validate_presence :hash_algorithm }
-  it { is_expected.to validate_includes(%w(sha1 sha256), :hash_algorithm) }
+  it { is_expected.to validate_includes(%w[sha1 sha256], :hash_algorithm) }
   it { is_expected.to validate_presence :federation_identifier }
   it { is_expected.to validate_presence :validity_period }
   it { is_expected.to validate_presence :cache_period }
 
   it { is_expected.to validate_presence :primary_tag }
-  it { is_expected.to validate_unique :primary_tag }
+  it { is_expected.to validate_presence :identifier }
+  it { is_expected.to validate_unique :identifier }
   it { is_expected.to validate_presence :all_entities }
 
   context 'optional attributes' do

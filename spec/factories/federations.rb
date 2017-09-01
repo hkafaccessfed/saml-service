@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :basic_federation, parent: :entity_source do
     after :create do |es|

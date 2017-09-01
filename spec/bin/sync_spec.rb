@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
-require Rails.root.join('bin/sync').to_s
+require Rails.root.join('bin', 'sync').to_s
 
 RSpec.describe 'bin/sync' do
   let(:entity_source) { create(:entity_source, :external) }

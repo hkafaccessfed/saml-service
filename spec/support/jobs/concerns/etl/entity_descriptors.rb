@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::EntityDescriptors' do
   # rubocop:disable Metrics/MethodLength
   def create_json(id, functioning = true, empty = false)
@@ -54,7 +56,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
   end
   # rubocop:enable Metrics/MethodLength
 
-  let(:ed_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:ed_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:entity_descriptor_list) do
     (0...entity_descriptor_count)
       .reduce([]) { |a, e| a << create_json(1000 + e) }
@@ -83,7 +85,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
 
   def run
     described_class.new(id: fr_source.id)
-      .entity_descriptors(organization, org_data)
+                   .entity_descriptors(organization, org_data)
   end
 
   context 'A non functioning EntityDescriptor' do
@@ -94,7 +96,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     end
 
     it 'does not create an EntityDescriptor' do
-      expect { run }.not_to change { EntityDescriptor.count }
+      expect { run }.not_to(change { EntityDescriptor.count })
     end
 
     context 'with existing EntityDescriptor reference' do
@@ -124,7 +126,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     end
 
     it 'does not create an EntityDescriptor' do
-      expect { run }.not_to change { EntityDescriptor.count }
+      expect { run }.not_to(change { EntityDescriptor.count })
     end
 
     context 'with existing EntityDescriptor reference' do
@@ -208,7 +210,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
 
       it 'modifies KnownEntity updated_at' do
         Timecop.travel(1.second) do
-          expect { run }.to change { subject.reload.known_entity.updated_at }
+          expect { run }.to(change { subject.reload.known_entity.updated_at })
         end
       end
 
@@ -222,10 +224,12 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
   context 'entity_descriptor json response' do
     shared_examples 'obj creation' do
       it 'creates EntityDescriptor' do
-        expect { run }.to change { EntityDescriptor.count }
-          .by(entity_descriptor_count)
+        expect { run }.to(
+          change { EntityDescriptor.count }
+            .by(entity_descriptor_count)
+        )
 
-        expect { run }.not_to change { Tag.count }
+        expect { run }.not_to(change { Tag.count })
       end
     end
 

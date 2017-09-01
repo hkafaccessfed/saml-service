@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :role_descriptor do
     entity_descriptor
     enabled true
 
     after(:create) do |rd|
-      rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
-      rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
+      rd.add_protocol_support(create(:protocol_support, role_descriptor: rd))
+      rd.add_protocol_support(create(:protocol_support, role_descriptor: rd))
     end
 
     trait :with_error_url do

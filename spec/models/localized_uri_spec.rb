@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe LocalizedURI do
@@ -23,6 +25,18 @@ describe LocalizedURI do
       it 'supports https' do
         subject.lang = 'en'
         subject.uri = 'https://example.org'
+        expect(subject).to be_valid
+      end
+
+      it 'supports hTtP' do
+        subject.lang = 'en'
+        subject.uri = 'hTtP://example.org'
+        expect(subject).to be_valid
+      end
+
+      it 'supports HttpS' do
+        subject.lang = 'en'
+        subject.uri = 'HttpS://example.org'
         expect(subject).to be_valid
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'KeyDescriptor xml' do
   let(:key_descriptor_path) { '/KeyDescriptor' }
   let(:key_info_path) { "#{key_descriptor_path}/ds:KeyInfo" }

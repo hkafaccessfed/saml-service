@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'SSODescriptor xml' do
   let(:artifact_resolution_service_path) do
     "#{sso_descriptor_path}/ArtifactResolutionService"

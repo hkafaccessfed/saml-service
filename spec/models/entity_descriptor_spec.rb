@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe EntityDescriptor do
@@ -130,7 +132,7 @@ describe EntityDescriptor do
 
     it 'modifies parent EntityDescriptor on save' do
       Timecop.travel(30.seconds) do
-        expect { subject.touch }.to change { subject.updated_at }
+        expect { subject.touch }.to(change { subject.updated_at })
       end
     end
   end

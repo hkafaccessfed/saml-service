@@ -1,31 +1,95 @@
+# frozen_string_literal: true
+
 module API
   class RawEntityDescriptorsController < APIController
+    include SetSAMLTypeFromXML
+
     before_action do
       @entity_source = EntitySource[source_tag: params[:tag]]
-      fail(ResourceNotFound) if @entity_source.nil?
+      raise(ResourceNotFound) if @entity_source.nil?
     end
 
-    def create
+    def update
       check_access!(access_path)
-      fail(BadRequest) unless valid_post_params?
-      render status: :ok, nothing: true
+      raise(BadRequest) unless valid_patch_params?
+      if existing_entity_id
+        update_raw_entity_descriptor
+        head :no_content
+      else
+        create_raw_entity_descriptor
+        head :created
+      end
     end
 
     private
 
-    def post_params
-      params.require(:raw_entity_descriptor)
-        .permit(:xml, :entity_id, :created_at, :updated_at, :enabled)
+    def create_raw_entity_descriptor
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        ke = KnownEntity.new(entity_source: @entity_source)
+        persist_known_entity(ke)
+
+        red = RawEntityDescriptor.new(known_entity: ke)
+        persist_raw_entity_descriptor(red)
+
+        EntityId.create(uri: entity_id_uri, raw_entity_descriptor: red)
+
+        set_saml_type(red, xml_node)
+        tag_known_entity(ke)
+      end
     end
 
-    def valid_post_params?
-      required_keys = [:xml, :entity_id, :created_at, :updated_at, :enabled]
-      required_keys.all? { |k| post_params.key? k }
+    def update_raw_entity_descriptor
+      red = existing_entity_id.raw_entity_descriptor
+      ke = red.known_entity
+
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        persist_known_entity(ke)
+        persist_raw_entity_descriptor(red)
+
+        set_saml_type(red, xml_node)
+        tag_known_entity(ke)
+      end
+    end
+
+    def persist_known_entity(ke)
+      ke.update(enabled: patch_params[:enabled])
+      ke.touch
+    end
+
+    def persist_raw_entity_descriptor(red)
+      red.update(enabled: patch_params[:enabled], xml: patch_params[:xml])
+    end
+
+    def existing_entity_id
+      EntityId.first(entity_source_id: @entity_source.id,
+                     uri: entity_id_uri)
+    end
+
+    def tag_known_entity(known_entity)
+      patch_params[:tags].each { |t| known_entity.tag_as(t) }
+      known_entity.tag_as(params[:tag])
+    end
+
+    def patch_params
+      params.require(:raw_entity_descriptor)
+            .permit(:xml, :enabled, tags: [])
+    end
+
+    def entity_id_uri
+      Base64.urlsafe_decode64(params[:base64_urlsafe_entity_id])
+    end
+
+    def valid_patch_params?
+      patch_params[:tags] && [true, false].include?(patch_params[:enabled])
     end
 
     def access_path
       "entity_sources:#{@entity_source.source_tag}:raw_entity_descriptors:"\
       'create'
+    end
+
+    def xml_node
+      Nokogiri::XML.parse(patch_params[:xml]).root
     end
   end
 end

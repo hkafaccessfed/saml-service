@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AttributeAuthorityDescriptor < RoleDescriptor
   one_to_many :attribute_services
   one_to_many :assertion_id_request_services

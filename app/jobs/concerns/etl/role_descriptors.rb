@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ETL
   module RoleDescriptors
     def role_descriptor(rd, rd_data, scopes_data)
@@ -16,17 +18,34 @@ module ETL
     def contact_people(rd, contact_people)
       # Contacts are stored at the ED level only within saml-service
       # This is more inline with eduGain policy and prevents duplication
-      rd.entity_descriptor.contact_people.each(&:destroy)
+      destroy_all_contact_people(rd)
       contact_people.each do |contact_person|
-        type = contact_person[:type][:name].to_sym
-        next unless ContactPerson::TYPE.key?(type)
+        type = contact_person[:type][:name].downcase.to_sym
+        next unless ContactPerson::TYPE.key?(type) || type == :security
 
         c = rd_contact(contact_person)
         next unless c
 
-        cp = ContactPerson.create(contact: c, contact_type: type)
-        rd.entity_descriptor.add_contact_person(cp)
+        next contact_person(rd, c, type) unless type == :security
+        sirtfi_contact_person(rd, c)
       end
+    end
+
+    def destroy_all_contact_people(role_descriptor)
+      role_descriptor.entity_descriptor.contact_people.each(&:destroy)
+      role_descriptor.entity_descriptor.sirtfi_contact_people.each(&:destroy)
+    end
+
+    def contact_person(role_descriptor, contact, type)
+      entity_descriptor = role_descriptor.entity_descriptor
+      cp = ContactPerson.create(contact: contact, contact_type: type)
+      entity_descriptor.add_contact_person(cp)
+    end
+
+    def sirtfi_contact_person(role_descriptor, contact)
+      entity_descriptor = role_descriptor.entity_descriptor
+      cp = SIRTFIContactPerson.create(contact: contact)
+      entity_descriptor.add_sirtfi_contact_person(cp)
     end
 
     def rd_contact(contact_person)
@@ -52,11 +71,16 @@ module ETL
         begin
           rd.add_key_descriptor(key_descriptor(kd_data))
         rescue OpenSSL::X509::CertificateError => e
-          Rails.logger.info(
-            "FR certificate \n#{kd_data[:key_info][:certificate][:data]}\n" \
-            "was invalid and not persisted due to: #{e.message}")
+          log_key_descriptor_error(kd_data, e)
         end
       end
+    end
+
+    def log_key_descriptor_error(kd_data, e)
+      Rails.logger.info(
+        "FR Certificate \n#{kd_data[:key_info][:certificate][:data]}\n" \
+        "was invalid and not persisted due to: #{e.message}"
+      )
     end
 
     def key_descriptor(kd_data)
@@ -97,7 +121,7 @@ module ETL
 
     def clean_certificate_data(data)
       data.gsub(/\\n/, "\n").lines.map(&:strip)
-        .flat_map { |l| l.chars.each_slice(72).map(&:join).to_a }.join("\n")
+          .flat_map { |l| l.chars.each_slice(72).map(&:join).to_a }.join("\n")
     end
   end
 end

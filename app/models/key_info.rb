@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class KeyInfo < Sequel::Model
-  ANCHOR_BEGIN = '-----BEGIN CERTIFICATE-----'
-  ANCHOR_END = '-----END CERTIFICATE-----'
+  ANCHOR_BEGIN = '-----BEGIN CERTIFICATE-----'.freeze
+  ANCHOR_END = '-----END CERTIFICATE-----'.freeze
 
   plugin :class_table_inheritance
 
@@ -14,7 +16,7 @@ class KeyInfo < Sequel::Model
 
   def validate
     super
-    validates_presence [:data, :created_at, :updated_at]
+    validates_presence %i[data created_at updated_at]
   end
 
   def data=(data)

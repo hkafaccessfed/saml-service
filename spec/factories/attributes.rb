@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :_attribute, class: 'Attribute' do
     name { Faker::Lorem.word }

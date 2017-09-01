@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :mdui_geolocation_hint, class: 'MDUI::GeolocationHint' do
     transient { components(2) }

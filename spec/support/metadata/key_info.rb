@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'ds:KeyInfo xml' do
   let(:key_info_path) { '/ds:KeyInfo' }
   let(:key_name_path) { "#{key_info_path}/ds:KeyName" }

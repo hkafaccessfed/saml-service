@@ -9,6 +9,8 @@ Sequel.migration do
       column :enabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      
+      index [:x509_cn], :name=>:x509_cn, :unique=>true
     end
     
     create_table(:authz_services) do
@@ -26,6 +28,15 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:derived_tags) do
+      primary_key :id, :type=>"int(11)"
+      column :tag_name, "varchar(255)", :null=>false
+      column :when_tags, "varchar(255)", :null=>false
+      column :unless_tags, "varchar(255)", :null=>false
+      column :created_at, "datetime", :null=>false
+      column :updated_at, "datetime", :null=>false
+    end
+    
     create_table(:endpoints) do
       primary_key :id, :type=>"int(11)"
       column :binding, "varchar(255)", :null=>false
@@ -37,7 +48,7 @@ Sequel.migration do
     
     create_table(:entity_sources) do
       primary_key :id, :type=>"int(11)"
-      column :rank, "int(11)", :null=>false
+      column :rank, "bigint(20)", :null=>false
       column :enabled, "tinyint(1)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
@@ -189,14 +200,15 @@ Sequel.migration do
       column :ca_verify_depth, "int(11)"
       column :hash_algorithm, "varchar(255)", :null=>false
       foreign_key :keypair_id, :keypairs, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :primary_tag, "varchar(255)", :null=>false
+      column :identifier, "varchar(255)", :null=>false
       column :all_entities, "tinyint(1)", :default=>true, :null=>false
       column :federation_identifier, "varchar(255)", :null=>false
       column :validity_period, "int(11)", :null=>false
       column :cache_period, "int(11)", :default=>21600, :null=>false
+      column :primary_tag, "varchar(255)", :null=>false
       
       index [:keypair_id], :name=>:keypair_id
-      index [:primary_tag], :unique=>true
+      index [:identifier], :unique=>true
     end
     
     create_table(:organization_display_names) do
@@ -271,6 +283,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :key=>[:id]
+      column :derived, "tinyint(1)", :default=>false
       
       index [:known_entity_id], :name=>:known_entity_id
       index [:name, :known_entity_id], :name=>:name_known_entity_id_un, :unique=>true
@@ -317,8 +330,10 @@ Sequel.migration do
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       column :sha1, "varchar(255)", :null=>false
       foreign_key :raw_entity_descriptor_id, :raw_entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_source_id, :entity_sources, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
+      index [:entity_source_id, :sha1], :unique=>true
       index [:raw_entity_descriptor_id], :name=>:red_eid_fkey
     end
     
@@ -473,7 +488,7 @@ Sequel.migration do
     
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
-      column :key_type_id, "int(11)", :null=>false
+      column :key_type_id, "int(11)"
       column :disabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -539,6 +554,20 @@ Sequel.migration do
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
+    end
+    
+    create_table(:sirtfi_contact_people) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:contact_id], :name=>:sirtfi_contact_fkey
+      index [:entity_descriptor_id], :name=>:sirtfi_ed_cp_fkey
+      index [:role_descriptor_id], :name=>:sirtfi_rd_cp_fkey
     end
     
     create_table(:ui_infos) do
@@ -853,5 +882,14 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160203023734_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160209223646_remove_source_tag_default_value.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160314045620_set_correct_encoding_collation.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160316030021_change_collation_to_binary.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160530102028_api_subject_unique_x509.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160711003010_add_entity_source_id_to_entity_ids.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920023804_rename_primary_tag_to_identifier_in_metadata_instance.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920024949_add_primary_tag_to_metadata_instances.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170616045451_add_derived_flag_to_tags.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170619194544_create_derived_tags.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802213241_make_key_type_id_nullable.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_allow_larger_rank_values.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170803002700_create_sirtfi_contact_people.rb')"
                 end
               end

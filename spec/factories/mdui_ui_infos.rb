@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :mdui_ui_info, class: 'MDUI::UIInfo' do
     role_descriptor

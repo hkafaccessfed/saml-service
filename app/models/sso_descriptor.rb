@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SSODescriptor < RoleDescriptor
   one_to_many :artifact_resolution_services
   one_to_many :single_logout_services

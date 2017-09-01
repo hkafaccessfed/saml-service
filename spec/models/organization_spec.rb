@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe Organization do
@@ -8,7 +10,7 @@ describe Organization do
   it { is_expected.to have_one_to_many :organization_urls }
 
   context 'validation' do
-    subject { create Organization }
+    subject { create(:organization) }
 
     it 'has at least 1 organization_name' do
       expect(subject).to validate_presence :organization_names,

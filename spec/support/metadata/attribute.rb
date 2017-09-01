@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'saml:Attribute xml' do
   let(:attribute_path) { '/saml:Attribute' }
   let(:attribute_value_path) { "#{attribute_path}/saml:AttributeValue" }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ETL
   module Organizations
     def organizations
@@ -18,7 +20,7 @@ module ETL
 
     def org_attrs(org_data)
       return {} unless org_data[:created_at]
-      { created_at: Time.parse(org_data[:created_at]) }
+      { created_at: Time.zone.parse(org_data[:created_at]) }
     end
 
     def organization_name(o, org_data)

@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module ETL
   module ServiceProviders
     include SSODescriptors
 
     def service_providers(ed, ed_data)
       ed_data[:saml][:service_providers].each do |sp_ref|
-        sp_data = fr_service_providers[sp_ref[:id]]
-        next unless sp_data[:saml].key?(:attribute_consuming_services) &&
-                    sp_data[:saml][:attribute_consuming_services].count > 0
+        data = fr_service_providers[sp_ref[:id]]
+        acs = data[:saml].try!(:[], :attribute_consuming_services)
+        next unless acs.try!(&:any?)
 
-        create_or_update_sp(ed, SPSSODescriptor.dataset, sp_data)
+        create_or_update_sp(ed, SPSSODescriptor.dataset, data)
       end
     end
 
@@ -27,7 +29,7 @@ module ETL
     def sp_attrs(sp_data)
       saml = sp_data[:saml]
       {
-        created_at: Time.parse(sp_data[:created_at]),
+        created_at: Time.zone.parse(sp_data[:created_at]),
         enabled: sp_data[:functioning],
         authn_requests_signed: saml[:authnrequests_signed],
         want_assertions_signed: saml[:assertions_signed]
@@ -72,7 +74,7 @@ module ETL
     def attribute_consuming_services(sp, acservices_data)
       sp.attribute_consuming_services.each(&:destroy)
       acservices_data.each_with_index do |ac_data, i|
-        next unless ac_data[:attributes].size > 0
+        next if ac_data[:attributes].empty?
 
         service_name = ServiceName.new(value: ac_data[:names][0], lang: 'en')
         acs = AttributeConsumingService.create(index: i + 1,
@@ -85,11 +87,22 @@ module ETL
 
     def acs_attributes(acs, ac_data)
       ac_data[:attributes].each do |attr_data|
+        next unless correctly_specified?(attr_data)
+
         base = fr_attributes[attr_data[:id]]
         ra = requested_attribute(acs, attr_data, base)
         acs.add_requested_attribute(ra)
         NameFormat.create(uri: base[:name_format][:uri], attribute: ra)
       end
+    end
+
+    def correctly_specified?(attr_data)
+      # Don't represent attributes that require specification but
+      # have not yet had specific values associated.
+      # For example eduPersonEntitlement but no entitlement values
+      # requested by the SP using our tooling as yet.
+      attr_data.fetch(:specification, false) == false ||
+        (attr_data[:specification] && attr_data[:values].present?)
     end
 
     def requested_attribute(acs, attr_data, base)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MetadataInstance < Sequel::Model
   plugin :update_or_create
 
@@ -10,14 +12,14 @@ class MetadataInstance < Sequel::Model
 
   def validate
     super
-    validates_presence [:name, :created_at, :updated_at, :hash_algorithm,
-                        :keypair, :federation_identifier, :validity_period,
-                        :primary_tag, :all_entities, :cache_period]
+    validates_presence %i[name created_at updated_at hash_algorithm
+                          keypair federation_identifier validity_period
+                          primary_tag identifier all_entities cache_period]
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
 
-    validates_unique :primary_tag
+    validates_unique :identifier
 
-    validates_includes %w(sha1 sha256), :hash_algorithm
+    validates_includes %w[sha1 sha256], :hash_algorithm
   end
 end

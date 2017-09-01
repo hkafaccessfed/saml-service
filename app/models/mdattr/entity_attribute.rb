@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MDATTR
   class EntityAttribute < Sequel::Model
     include Parents
@@ -11,11 +13,11 @@ module MDATTR
 
     def validate
       super
-      validates_presence [:created_at, :updated_at]
+      validates_presence %i[created_at updated_at]
       return if new?
 
       validates_presence :attributes
-      single_parent [:metadata_instance, :entity_descriptor]
+      single_parent %i[metadata_instance entity_descriptor]
     end
   end
 end

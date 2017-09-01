@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'shibmd:KeyAuthority xml' do
   context 'CA keys' do
     let(:key_authority_path) { "#{extensions_path}/shibmd:KeyAuthority" }

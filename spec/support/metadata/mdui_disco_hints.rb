@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'mdui:DiscoHints xml' do
   let(:mdui_disco_path) { '/mdui:DiscoHints' }
   let(:ip_hint_path) { "#{mdui_disco_path}/mdui:IPHint" }

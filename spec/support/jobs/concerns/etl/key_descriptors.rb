@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'key_descriptors' do
   it 'has source data' do
     expect(source.count).to be > 0

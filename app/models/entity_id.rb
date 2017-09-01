@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'digest/sha1'
 
 class EntityId < SamlURI
@@ -10,14 +12,16 @@ class EntityId < SamlURI
     super
     validates_presence :sha1
     validates_max_length 1024, :uri
+    validates_unique %i[entity_source_id sha1]
     return if new?
 
-    single_parent [:entity_descriptor, :raw_entity_descriptor]
+    single_parent %i[entity_descriptor raw_entity_descriptor]
   end
 
   def before_validation
     super
     self.sha1 = Digest::SHA1.hexdigest uri if uri
+    self.entity_source_id = parent.try(:known_entity).try(:entity_source_id)
   end
 
   def parent

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :mdui_keyword_list, class: 'MDUI::KeywordList' do
     lang { 'en' }

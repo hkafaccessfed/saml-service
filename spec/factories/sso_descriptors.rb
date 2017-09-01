@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :sso_descriptor, class: 'SSODescriptor', parent: :role_descriptor do
     trait :with_artifact_resolution_service do

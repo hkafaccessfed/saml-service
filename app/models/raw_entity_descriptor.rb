@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 require 'metadata/schema'
 
@@ -11,13 +13,13 @@ class RawEntityDescriptor < Sequel::Model
 
   plugin :association_dependencies, entity_id: :destroy
 
-  alias_method :idp?, :idp
-  alias_method :sp?, :sp
-  alias_method :standalone_aa?, :standalone_aa
+  alias idp? idp
+  alias sp? sp
+  alias standalone_aa? standalone_aa
 
   def validate
     super
-    validates_presence [:known_entity, :xml, :created_at, :updated_at]
+    validates_presence %i[known_entity xml created_at updated_at]
     validates_presence :entity_id, allow_missing: new?
     # Any more than 16_777_215, the column type needs to be upgraded (again).
     validates_max_length 16_777_215, :xml

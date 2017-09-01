@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IDPSSODescriptor < SSODescriptor
   one_to_many :single_sign_on_services
   one_to_many :name_id_mapping_services

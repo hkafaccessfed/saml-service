@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe ContactPerson do
@@ -7,7 +9,7 @@ describe ContactPerson do
   it { is_expected.to validate_presence :contact_type_id }
   it { is_expected.to validate_presence :contact_type }
 
-  types = [:technical, :support, :administrative, :billing, :other]
+  types = %i[technical support administrative billing other]
   it { is_expected.to validate_includes types, :contact_type }
 
   context 'optional attributes' do

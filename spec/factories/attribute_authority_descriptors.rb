@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :attribute_authority_descriptor,
           parent: :role_descriptor, class: 'AttributeAuthorityDescriptor' do

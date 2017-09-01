@@ -1,8 +1,14 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::ServiceProviders' do
   include_examples 'ETL::Common'
 
   # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_json(sp)
+    contact_people =
+      contact_instances.map { |cp| contact_person_json(cp) } +
+      sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+
     {
       id: sp.id,
       display_name: Faker::Lorem.sentence,
@@ -37,8 +43,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
             key_descriptors:
               sp.key_descriptors.map { |kd| key_descriptor_json(kd) }
                 .push(bad_key_descriptor_json),
-            contact_people:
-              contact_instances.map { |cp| contact_person_json(cp) },
+            contact_people: contact_people,
             error_url: sp.error_url
           },
           name_id_formats:
@@ -63,7 +68,8 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       name: Faker::Lorem.word,
       is_required: false,
       reason: Faker::Lorem.word,
-      values: []
+      specification: ra[:specification] ||= false,
+      values: ra[:values]
     }
   end
 
@@ -85,7 +91,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   def run
     described_class.new(id: fr_source.id)
-      .service_providers(entity_descriptor, ed_data)
+                   .service_providers(entity_descriptor, ed_data)
   end
 
   let(:service_provider_instances) do
@@ -108,7 +114,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   let(:service_providers) { service_providers_list }
 
-  let(:sp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:sp_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
 
   let(:entity_descriptor) { create :entity_descriptor }
 
@@ -128,9 +134,23 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       {
         id: i,
         description: Faker::Lorem.sentence,
-        oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}"
+        oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
+        values: []
       }
-    end
+    end.push(
+      id: attribute_count,
+      description: Faker::Lorem.sentence,
+      oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
+      values: [],
+      specification: true
+    ).push(
+      id: attribute_count + 1,
+      description: Faker::Lorem.sentence,
+      oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
+      values: [{ approved: true, value: Faker::Number.number(4) },
+               { approved: false, value: Faker::Number.number(3) }],
+      specification: true
+    )
   end
 
   let(:attributes_list) do
@@ -141,7 +161,9 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   before do
     stub_fr_request(:contacts)
-    contact_instances.each { |c| fr_object(Contact.name, c.id) }
+
+    [*contact_instances, *sirtfi_contact_instances]
+      .each { |c| fr_object(Contact.name, c.id) }
 
     stub_fr_request(:attributes)
     stub_fr_request(:service_providers)
@@ -151,6 +173,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     let(:source_sp) { service_provider_instances.first }
     let(:sp_count) { 1 }
     let(:contact_count) { 2 }
+    let(:sirtfi_contact_count) { 2 }
     let(:attribute_count) { 3 }
 
     subject { SPSSODescriptor.last }
@@ -171,10 +194,14 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     context 'created instance' do
       before { run }
 
+      it 'is provided with attributes that are not acceptable' do
+        expect(attribute_instances.size).to eq(attribute_count + 2)
+      end
+
       it 'requests expected number of attributes' do
         run
         expect(AttributeConsumingService.last.reload.requested_attributes.size)
-          .to eq(attribute_count)
+          .to eq(attribute_count + 1)
       end
 
       context 'assertion_consumer_services' do
@@ -211,6 +238,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
           let(:source) do
             service_providers
               .first[:saml][:sso_descriptor][:role_descriptor][:contact_people]
+              .reject { |cp| cp.dig(:type, :name) == 'Security' }
           end
         end
       end
@@ -250,6 +278,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
     let(:sp_count) { 1 }
     let(:contact_count) { 2 }
+    let(:sirtfi_contact_count) { 2 }
     let(:attribute_count) { 3 }
 
     before { run }
@@ -258,23 +287,23 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     include_examples 'updating MDUI content'
 
     it 'uses the existing instance' do
-      expect { run }.not_to change { SPSSODescriptor.count }
+      expect { run }.not_to(change { SPSSODescriptor.count })
     end
 
     it 'does not create more tags' do
-      expect { run }.not_to change { Tag.count }
+      expect { run }.not_to(change { Tag.count })
     end
 
     it 'updates assertion_consumer_services' do
-      expect { run }.to change { subject.reload.assertion_consumer_services }
+      expect { run }.to(change { subject.reload.assertion_consumer_services })
     end
 
     it 'updates discovery_response_services' do
-      expect { run }.to change { subject.reload.discovery_response_services }
+      expect { run }.to(change { subject.reload.discovery_response_services })
     end
 
     it 'updates attribute_consuming_services' do
-      expect { run }.to change { subject.reload.attribute_consuming_services }
+      expect { run }.to(change { subject.reload.attribute_consuming_services })
     end
   end
 end

@@ -21,3 +21,5 @@ production:
   username: <%= ENV['SAML_DB_USERNAME'] %>
   password: <%= ENV['SAML_DB_PASSWORD'] %>
   database: <%= ENV['SAML_DB_NAME'] %>
+  host: <%= ENV['SAML_DB_HOST'] %>
+  port: <%= ENV['SAML_DB_PORT'] %>

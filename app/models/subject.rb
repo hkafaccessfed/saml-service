@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Subject < Sequel::Model
   include Accession::Principal
 
@@ -12,8 +14,8 @@ class Subject < Sequel::Model
   end
 
   def validate
-    validates_presence [:name, :mail, :enabled, :complete,
-                        :created_at, :updated_at]
-    validates_presence [:targeted_id, :shared_token] if complete
+    validates_presence %i[name mail enabled complete
+                          created_at updated_at]
+    validates_presence %i[targeted_id shared_token] if complete
   end
 end

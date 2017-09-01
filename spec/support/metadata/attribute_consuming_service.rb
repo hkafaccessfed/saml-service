@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'AttributeConsumingService xml' do
   let(:service_name_path) { "#{attribute_consuming_service_path}/ServiceName" }
 

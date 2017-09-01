@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RoleDescriptor < Sequel::Model
   many_to_one :entity_descriptor
   many_to_one :organization
@@ -5,6 +7,7 @@ class RoleDescriptor < Sequel::Model
   one_to_many :protocol_supports
   one_to_many :key_descriptors
   one_to_many :contact_people
+  one_to_many :sirtfi_contact_people
   one_to_many :scopes, class: 'SHIBMD::Scope'
 
   one_to_one :ui_info, class: 'MDUI::UIInfo'
@@ -18,7 +21,7 @@ class RoleDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:entity_descriptor, :enabled, :created_at, :updated_at]
+    validates_presence %i[entity_descriptor enabled created_at updated_at]
     return if new?
 
     validates_presence :protocol_supports

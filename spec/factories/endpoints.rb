@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   trait :endpoint do
     binding { "urn:oasis:names:tc:SAML:2.0:bindings:#{Faker::Lorem.word}" }

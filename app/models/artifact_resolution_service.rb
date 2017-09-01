@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtifactResolutionService < IndexedEndpoint
   many_to_one :sso_descriptor
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe KeyInfo do
@@ -31,9 +33,9 @@ describe KeyInfo do
     let(:cert) { subject.certificate_without_anchors }
     it 'provides certificate data without anchors' do
       data = subject.certificate
-             .sub('-----BEGIN CERTIFICATE-----', '')
-             .sub('-----END CERTIFICATE-----', '')
-             .strip
+                    .sub('-----BEGIN CERTIFICATE-----', '')
+                    .sub('-----END CERTIFICATE-----', '')
+                    .strip
       expect(data).to eq(cert)
     end
   end

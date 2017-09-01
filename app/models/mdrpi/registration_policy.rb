@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MDRPI
   class RegistrationPolicy < LocalizedURI
     many_to_one :registration_info

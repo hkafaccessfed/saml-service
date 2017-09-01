@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'ContactPerson xml' do
   let(:contact_person_path) { '/ContactPerson' }
   let(:contact_person_company_path) { "#{contact_person_path}/Company" }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module QueryFederationRegistry
   def fr_contacts
     data(fr_source.contacts_url)[:contacts]
@@ -42,8 +44,10 @@ module QueryFederationRegistry
     response = do_request(url)
     return response.body if response.is_a?(Net::HTTPSuccess)
 
-    fail("Unable to update FederationRegistrySource(id=#{source.id} " \
-         "url=#{url}). Response was: #{response.code} #{response.message}")
+    primary_error =
+      "Unable to update FederationRegistrySource(id=#{source.id} url=#{url})."
+    secondary_error = "Response was: #{response.code} #{response.message}"
+    raise("#{primary_error}\n#{secondary_error}")
   end
 
   def do_request(url)

@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :entity_source do
     enabled true
-    rank { (Time.now.to_f * 100).to_i }
-    source_tag { Faker::Lorem.words.join('-') }
+    # Max BIGINT value + 1, according to MySQL documentation
+    rank { rand(9_223_372_036_854_775_808) }
+    sequence(:source_tag) { |n| "#{Faker::Lorem.characters(20)}-#{n}" }
 
     trait :external do
       url { "https://#{Faker::Internet.domain_name}/federation/metadata.xml" }

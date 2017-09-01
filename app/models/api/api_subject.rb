@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module API
   class APISubject < Sequel::Model
     include Accession::Principal
@@ -13,9 +15,12 @@ module API
     end
 
     def validate
-      validates_presence [:x509_cn, :description,
-                          :contact_name, :contact_mail, :enabled,
-                          :created_at, :updated_at]
+      validates_presence %i[x509_cn description
+                            contact_name contact_mail enabled
+                            created_at updated_at]
+
+      validates_unique :x509_cn
+      validates_format(/\A[\w-]+\z/, :x509_cn)
     end
   end
 end

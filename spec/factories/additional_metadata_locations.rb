@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryGirl.define do
   factory :additional_metadata_location do
     uri { Faker::Internet.url }

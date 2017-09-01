@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'Endpoint xml' do
   it 'is created' do
     expect(xml).to have_xpath(endpoint_path)

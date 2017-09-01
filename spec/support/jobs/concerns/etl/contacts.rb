@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::Contacts' do
   def create_json(id)
     {
@@ -11,9 +13,10 @@ RSpec.shared_examples 'ETL::Contacts' do
     }
   end
 
-  let(:contact_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:contact_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:contact_list) do
-    (0...contact_count).reduce([]) { |a, e| a << create_json(1000 + e) }
+    total = contact_count + sirtfi_contact_count
+    (0...total).reduce([]) { |a, e| a << create_json(1000 + e) }
   end
 
   before do
@@ -27,6 +30,7 @@ RSpec.shared_examples 'ETL::Contacts' do
   context 'creating a contact' do
     let(:contacts) { contact_list }
     let(:contact_count) { 1 }
+    let(:sirtfi_contact_count) { 1 }
     before { run }
     subject { Contact.last }
 
@@ -61,26 +65,31 @@ RSpec.shared_examples 'ETL::Contacts' do
 
     shared_examples 'obj creation' do
       it 'creates contact' do
-        expect { run }.to change { Contact.count }.by(contact_count)
+        expect { run }.to change { Contact.count }
+          .by(contact_count + sirtfi_contact_count)
       end
     end
 
     context 'single new contact' do
       let(:contact_count) { 1 }
+      let(:sirtfi_contact_count) { 1 }
       include_examples 'obj creation'
     end
 
     context 'multiple new contacts' do
       let(:contact_count) { rand(2..20) }
+      let(:sirtfi_contact_count) { rand(2..20) }
       include_examples 'obj creation'
     end
 
     context 'updating contacts' do
       let(:contact_count) { 1 }
+      let(:sirtfi_contact_count) { 1 }
       before { run }
 
       context 'subsequent requests' do
         let(:contact_count) { 0 }
+        let(:sirtfi_contact_count) { 0 }
         before { run }
         include_examples 'obj creation'
       end

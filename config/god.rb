@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 require 'fileutils'
 
@@ -24,14 +26,11 @@ def defaults(w, name)
 end
 
 God.watch do |w|
-  defaults(w, 'unicorn')
+  defaults(w, 'puma')
 
-  config = YAML.load_file(File.join(ROOT, 'config', 'deploy.yml'))
-  port = config['unicorn_port']
-
-  w.start = "bundle exec unicorn -c config/unicorn.rb -D -p #{port}"
-  w.restart = -> { God.registry['unicorn'].signal('USR2') }
+  w.start = 'bundle exec puma -C config/puma.rb'
+  w.restart = -> { God.registry['puma'].signal('USR2') }
 
   w.env = { 'RAILS_ENV' => RAILS_ENV }
-  w.pid_file = File.join(PID_FILE_DIRECTORY, 'unicorn.pid')
+  w.pid_file = File.join(PID_FILE_DIRECTORY, 'puma.pid')
 end

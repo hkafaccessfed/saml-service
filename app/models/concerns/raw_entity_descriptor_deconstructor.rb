@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 # rubocop:disable Metrics/ModuleLength
 module RawEntityDescriptorDeconstructor
   extend ActiveSupport::Concern
   def ui_info
     ui_info_node = Nokogiri::XML.parse(xml).xpath(UI_INFO_PATH)
-    return unless ui_info_node.present?
+    return if ui_info_node.blank?
 
     ui_info = os(display_names: [], descriptions: [], logos: [],
                  information_urls: [], privacy_statement_urls: [])
@@ -20,7 +22,7 @@ module RawEntityDescriptorDeconstructor
   def disco_hints
     doc = Nokogiri::XML.parse(xml)
     disco_hints_node = doc.xpath(DISCO_HINTS_PATH)
-    return unless disco_hints_node.present?
+    return if disco_hints_node.blank?
 
     disco_hints = os(ip_hints: [], domain_hints: [], geolocation_hints: [])
 
@@ -34,7 +36,7 @@ module RawEntityDescriptorDeconstructor
   def discovery_response_services
     doc = Nokogiri::XML.parse(xml)
     discovery_response_node = doc.xpath(DISCOVERY_RESPONSE_PATH)
-    return unless discovery_response_node.present?
+    return if discovery_response_node.blank?
 
     extract_discovery_response_services(discovery_response_node)
   end
@@ -42,12 +44,10 @@ module RawEntityDescriptorDeconstructor
   def single_sign_on_services
     doc = Nokogiri::XML.parse(xml)
     single_sign_on_services_node = doc.xpath(SINGLE_SIGN_ON_SERVICE_PATH)
-    return unless single_sign_on_services_node.present?
+    return if single_sign_on_services_node.blank?
 
     extract_single_sign_on_services(single_sign_on_services_node)
   end
-
-  private
 
   def display_names(ui_info_node, ui_info)
     ui_info_node.xpath(UI_INFO_DISPLAY_NAME_PATH).each do |dn|
@@ -149,7 +149,7 @@ module RawEntityDescriptorDeconstructor
     private
 
     def element_xpath(uri, name)
-      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"]).freeze
+      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"])
     end
 
     def mdui_element_xpath(name)

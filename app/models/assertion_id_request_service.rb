@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AssertionIdRequestService < Endpoint
   include Parents
 
@@ -8,6 +10,6 @@ class AssertionIdRequestService < Endpoint
     super
     return if new?
 
-    single_parent [:idp_sso_descriptor, :attribute_authority_descriptor]
+    single_parent %i[idp_sso_descriptor attribute_authority_descriptor]
   end
 end

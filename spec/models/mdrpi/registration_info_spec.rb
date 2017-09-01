@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe MDRPI::RegistrationInfo, type: :model do
@@ -50,7 +52,7 @@ RSpec.describe MDRPI::RegistrationInfo, type: :model do
       expect(subject.registration_instant_utc).to eq(subject.created_at.utc)
     end
     it 'uses registration_instant if set' do
-      subject.registration_instant = Time.now - 2.months
+      subject.registration_instant = Time.zone.now - 2.months
       expect(subject.registration_instant_utc)
         .to eq(subject.registration_instant.utc)
     end

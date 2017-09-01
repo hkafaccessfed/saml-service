@@ -13,6 +13,9 @@
   <import namespace="urn:oasis:names:tc:SAML:metadata:attribute" schemaLocation="sstc-metadata-attr.xsd"/>
   <import namespace="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" schemaLocation="sstc-saml-idp-discovery.xsd"/>
 
+  <!-- SIRTFI contact support -->
+  <import namespace="http://refeds.org/metadata" schemaLocation="refeds_metadata_extension_schema.xsd"/>
+
   <!-- WS Fed support, due to usage in wider eduGAIN supplied ED -->
   <import namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" schemaLocation="oasis-200401-wss-wssecurity-utility-1.0.xsd" />
   <import namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" schemaLocation="oasis-200401-wss-wssecurity-secext-1.0.xsd" />

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'shibmd:Scope xml' do
   let(:shibmd_scope_path) { '/shibmd:Scope' }
   let(:node) { xml.first(:xpath, shibmd_scope_path) }

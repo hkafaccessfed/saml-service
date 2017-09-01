@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'AttributeAuthorityDescriptor xml' do
   let(:attribute_service_path) do
     "#{attribute_authority_descriptor_path}/AttributeService"

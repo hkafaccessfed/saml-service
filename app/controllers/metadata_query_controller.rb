@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'metadata/saml'
 require 'metadata/schema_invalid_error'
 
@@ -44,9 +46,9 @@ class MetadataQueryController < ApplicationController
   def handle_entities_request(tags)
     Sequel::Model.db.transaction(isolation: :repeatable) do
       known_entities = KnownEntity.with_all_tags(tags)
-      return not_found unless known_entities.present?
+      return not_found if known_entities.blank?
 
-      etag = generate_known_entities_etag(known_entities)
+      etag = generate_document_entities_etag(@metadata_instance, known_entities)
       if known_entities_unmodified?(known_entities, etag)
         return head :not_modified
       end
@@ -60,7 +62,7 @@ class MetadataQueryController < ApplicationController
 
     Sequel::Model.db.transaction(isolation: :repeatable) do
       known_entity = entity_id.parent.known_entity
-      etag = generate_descriptor_etag(known_entity)
+      etag = generate_document_entities_etag(@metadata_instance, [known_entity])
       return head :not_modified if known_entity_unmodified?(known_entity, etag)
 
       create_known_entity_response(known_entity, etag)
@@ -89,8 +91,8 @@ class MetadataQueryController < ApplicationController
   end
 
   def ensure_metadata_instance
-    @metadata_instance =
-      MetadataInstance[primary_tag: params[:primary_tag]]
+    @metadata_instance = MetadataInstance[identifier: params[:instance]]
+
     if @metadata_instance
       @saml_renderer = Metadata::SAML.new(metadata_instance: @metadata_instance)
       return

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'RawEntityDescriptor xml' do
   let(:ed_xml) do
     <<-EOF.strip_heredoc
@@ -18,7 +20,7 @@ RSpec.shared_examples 'RawEntityDescriptor xml' do
   let(:entity_source) { known_entity.entity_source }
   let(:entity_descriptor_path) { '/EntityDescriptor' }
 
-  context 'Root EntityDescriptor'do
+  context 'Root EntityDescriptor' do
     before { subject.root_entity_descriptor(known_entity) }
 
     context 'attributes' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MDUI
   class UIInfo < Sequel::Model
     many_to_one :role_descriptor, class: 'RoleDescriptor'
@@ -18,10 +20,10 @@ module MDUI
 
     def validate
       super
-      validates_presence [:role_descriptor, :created_at, :updated_at]
+      validates_presence %i[role_descriptor created_at updated_at]
       return if new?
 
-      validates_presence [:display_names, :descriptions]
+      validates_presence %i[display_names descriptions]
     end
   end
 end

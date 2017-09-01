@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Attribute < Sequel::Model
   include Parents
 
@@ -14,10 +16,10 @@ class Attribute < Sequel::Model
 
   def validate
     super
-    validates_presence [:name, :created_at, :updated_at]
+    validates_presence %i[name created_at updated_at]
     return if new?
 
-    single_parent [:idp_sso_descriptor, :attribute_authority_descriptor,
-                   :entity_attribute]
+    single_parent %i[idp_sso_descriptor attribute_authority_descriptor
+                     entity_attribute]
   end
 end

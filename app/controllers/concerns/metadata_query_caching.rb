@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'metadata/schema'
 require 'metadata/schema_invalid_error'
 
@@ -6,14 +8,13 @@ module MetadataQueryCaching
 
   include Metadata::Schema
 
-  def generate_known_entities_etag(known_entities)
-    timestamps = known_entities.map(&:updated_at).map(&:to_i).join('.')
-    digest = Digest::MD5.hexdigest("samlmetadata/#{timestamps}")
-    generate_etag(digest)
-  end
+  def generate_document_entities_etag(metadata_instance, known_entities)
+    keys = known_entities.sort_by(&:id)
+                         .map { |ke| "#{ke.id}-#{ke.updated_at.to_i}" }
 
-  def generate_descriptor_etag(desc)
-    digest = Digest::MD5.hexdigest("samlmetadata/#{desc.id}-#{desc.updated_at}")
+    payload = "samlmetadata/#{metadata_instance.identifier}/#{keys.join('.')}"
+
+    digest = Digest::MD5.hexdigest(payload)
     generate_etag(digest)
   end
 
@@ -65,8 +66,8 @@ module MetadataQueryCaching
     doc = @saml_renderer.builder.doc
     return if metadata_schema.valid?(doc)
 
-    fail Metadata::SchemaInvalidError, 'metadata is not schema valid\n' \
-                                       "#{metadata_schema.validate(doc)}"
+    raise Metadata::SchemaInvalidError,
+          "Metadata is not schema valid #{metadata_schema.validate(doc)}"
   end
 
   def ttl

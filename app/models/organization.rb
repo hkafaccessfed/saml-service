@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Organization < Sequel::Model
   one_to_many :organization_names
   one_to_many :organization_display_names
@@ -12,7 +14,7 @@ class Organization < Sequel::Model
 
   def validate
     super
-    validates_presence [:created_at, :updated_at]
+    validates_presence %i[created_at updated_at]
     validates_presence :organization_names, allow_missing: new?
     validates_presence :organization_display_names, allow_missing: new?
     validates_presence :organization_urls, allow_missing: new?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'md:EntitiesDescriptor xml' do
   let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
   let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }

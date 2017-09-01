@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'metadata/saml_namespaces'
 
 module Metadata
@@ -18,7 +20,7 @@ module Metadata
         scope.parent[:FriendlyName] = attr.friendly_name
       end
 
-      attr.attribute_values.each do |attr_val|
+      attr.attribute_values { |ds| ds.order(:value) }.each do |attr_val|
         attribute_value(attr_val)
       end
     end
@@ -59,10 +61,22 @@ module Metadata
           signature_element
           entities_descriptor_extensions
 
-          filter_known_entities(known_entities).each do |ke|
-            known_entity(ke)
-          end
+          render_known_entities(known_entity_list(known_entities))
         end
+      end
+    end
+
+    def render_known_entities(known_entity_list)
+      known_entity_list.each do |e|
+        entity_descriptor(e) if e.instance_of? EntityDescriptor
+        raw_entity_descriptor(e) if e.instance_of? RawEntityDescriptor
+      end
+    end
+
+    def known_entity_list(known_entities)
+      filter_known_entities(known_entities).map do |ke_list|
+        ke_list.find(&:functioning_entity)
+               .try(:functioning_entity)
       end
     end
 
@@ -80,8 +94,8 @@ module Metadata
     # Lowest rank for EntitySource where multiple instances of
     # EntityDescriptor represented by the same EntityId exist is authoritative.
     def filter_known_entities(known_entities)
-      group_by_eid(known_entities).flat_map do |_, entities|
-        sort_eid_hash_by_source_rank(entities).first
+      group_by_eid(known_entities).map do |_, entities|
+        sort_eid_hash_by_source_rank(entities)
       end
     end
 
@@ -91,14 +105,6 @@ module Metadata
 
     def sort_eid_hash_by_source_rank(entities)
       entities.sort_by { |ke| ke.entity_source.try(:rank) }
-    end
-
-    def known_entity(ke)
-      if ke.entity_descriptor.try(:functioning?)
-        entity_descriptor(ke.entity_descriptor)
-      elsif ke.raw_entity_descriptor.try(:functioning?)
-        raw_entity_descriptor(ke.raw_entity_descriptor)
-      end
     end
 
     def root_entity_descriptor(ke)
@@ -112,11 +118,11 @@ module Metadata
       end
     end
 
-    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
-    TRANSFORM_METHODS = %w(
+    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'.freeze
+    TRANSFORM_METHODS = %w[
       http://www.w3.org/2000/09/xmldsig#enveloped-signature
       http://www.w3.org/2001/10/xml-exc-c14n#
-    )
+    ].freeze
 
     SIGNATURE_METHOD = {
       sha1: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
@@ -171,7 +177,7 @@ module Metadata
 
     def key_authority(ed)
       shibmd.KeyAuthority(VerifyDepth: ed.ca_verify_depth) do |_|
-        ed.ca_key_infos.each do |ca|
+        ed.ca_key_infos { |ds| ds.order(:data) }.each do |ca|
           key_info(ca)
         end
       end
@@ -196,7 +202,7 @@ module Metadata
                 publicationId: instance_id }
 
       mdrpi.PublicationInfo(ns, attrs) do |_|
-        publication_info.usage_policies.each do |up|
+        publication_info.usage_policies { |ds| ds.order(:id) }.each do |up|
           mdrpi.UsagePolicy(up.uri, 'xml:lang' => up.lang)
         end
       end
@@ -204,7 +210,7 @@ module Metadata
 
     def entity_attribute(ea)
       mdattr.EntityAttributes(ns) do |_|
-        ea.attributes.each do |attr|
+        ea.attributes { |ds| ds.order(:name) }.each do |attr|
           attribute(attr)
         end
       end
@@ -243,22 +249,34 @@ module Metadata
         signature_element if root_node
         entity_descriptor_extensions(ed, root_node)
 
-        ed.idp_sso_descriptors.each do |idp|
+        ed.idp_sso_descriptors { |ds| ds.order(:id) }.each do |idp|
           idp_sso_descriptor(idp) if idp.functioning?
         end
 
-        ed.sp_sso_descriptors.each do |sp|
+        ed.sp_sso_descriptors { |ds| ds.order(:id) }.each do |sp|
           sp_sso_descriptor(sp) if sp.functioning?
         end
 
-        ed.attribute_authority_descriptors.each do |aad|
+        ed.attribute_authority_descriptors { |ds| ds.order(:id) }.each do |aad|
           attribute_authority_descriptor(aad) if aad.functioning?
         end
 
         organization(ed.organization)
 
-        ed.contact_people.each do |cp|
+        contact_people = ed.contact_people do |ds|
+          ds.order(:contact_type_id, :contact_id)
+        end
+
+        contact_people.each do |cp|
           contact_person(cp)
+        end
+
+        sirtfi_contact_people = ed.sirtfi_contact_people do |ds|
+          ds.order(:contact_id)
+        end
+
+        sirtfi_contact_people.each do |cp|
+          sirtfi_contact_person(cp)
         end
       end
     end
@@ -275,10 +293,11 @@ module Metadata
       attributes = {
         registrationAuthority: mi.registration_info.registration_authority,
         registrationInstant: mi.registration_info
-                             .registration_instant_utc.xmlschema
+                               .registration_instant_utc.xmlschema
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
-        mi.registration_info.registration_policies.each do |rp|
+        rps = mi.registration_info.registration_policies { |ds| ds.order(:uri) }
+        rps.each do |rp|
           mdrpi.RegistrationPolicy(rp.uri, 'xml:lang' => rp.lang)
         end
       end
@@ -286,15 +305,15 @@ module Metadata
 
     def organization(org)
       root.Organization(ns) do |_|
-        org.organization_names.each do |name|
+        org.organization_names { |ds| ds.order(:value) }.each do |name|
           root.OrganizationName(name.value, 'xml:lang' => name.lang)
         end
 
-        org.organization_display_names.each do |dname|
+        org.organization_display_names { |ds| ds.order(:value) }.each do |dname|
           root.OrganizationDisplayName(dname.value, 'xml:lang' => dname.lang)
         end
 
-        org.organization_urls.each do |url|
+        org.organization_urls { |ds| ds.order(:uri) }.each do |url|
           root.OrganizationURL(url.uri, 'xml:lang' => url.lang)
         end
       end
@@ -307,7 +326,25 @@ module Metadata
         root.Company(c.company) if c.company.present?
         root.GivenName(c.given_name) if c.given_name.present?
         root.SurName(c.surname) if c.surname.present?
-        unless c.email_address.blank?
+        if c.email_address.present?
+          root.EmailAddress("mailto:#{c.email_address}")
+        end
+        root.TelephoneNumber(c.telephone_number) if c.telephone_number.present?
+      end
+    end
+
+    def sirtfi_contact_person(cp)
+      attributes = {
+        contactType: 'other',
+        'remd:contactType': 'http://refeds.org/metadata/contactType/security'
+      }
+
+      c = cp.contact
+      root.ContactPerson(ns, attributes) do |_|
+        root.Company(c.company) if c.company.present?
+        root.GivenName(c.given_name) if c.given_name.present?
+        root.SurName(c.surname) if c.surname.present?
+        if c.email_address.present?
           root.EmailAddress("mailto:#{c.email_address}")
         end
         root.TelephoneNumber(c.telephone_number) if c.telephone_number.present?
@@ -321,11 +358,11 @@ module Metadata
 
       role_descriptor_extensions(rd, scope)
 
-      rd.key_descriptors.each do |kd|
+      rd.key_descriptors { |ds| ds.order(:id) }.each do |kd|
         key_descriptor(kd) unless kd.disabled
       end
 
-      rd.contact_people.each { |cp| contact_person(cp) }
+      rd.contact_people { |ds| ds.order(:id) }.each { |cp| contact_person(cp) }
     end
 
     def role_descriptor_extensions(rd, scope)
@@ -335,7 +372,7 @@ module Metadata
         ui_info(rd.ui_info) if rd.ui_info.present?
 
         if rd.scopes?
-          rd.scopes.each do |s|
+          rd.scopes { |ds| ds.order(:value) }.each do |s|
             shibmd_scope(s)
           end
         end
@@ -347,7 +384,8 @@ module Metadata
 
         # SPSSODescriptor specific
         if rd.is_a? SPSSODescriptor
-          rd.discovery_response_services.each do |rds|
+          rd.discovery_response_services { |ds| ds.order(:index, :location) }
+            .each do |rds|
             idpdisc.DiscoveryResponse do |rds_node|
               indexed_endpoint(rds, rds_node)
             end
@@ -370,19 +408,18 @@ module Metadata
     def sso_descriptor(sso, scope)
       role_descriptor(sso, scope)
 
-      sso.artifact_resolution_services.each do |ars|
-        artifact_resolution_service(ars)
-      end
+      sso.artifact_resolution_services { |ds| ds.order(:index, :location) }
+         .each { |ars| artifact_resolution_service(ars) }
 
-      sso.single_logout_services.each do |slo|
+      sso.single_logout_services { |ds| ds.order(:location) }.each do |slo|
         single_logout_service(slo)
       end
 
-      sso.manage_name_id_services.each do |slo|
+      sso.manage_name_id_services { |ds| ds.order(:location) }.each do |slo|
         manage_name_id_service(slo)
       end
 
-      sso.name_id_formats.each do |ndif|
+      sso.name_id_formats { |ds| ds.order(:uri) }.each do |ndif|
         root.NameIDFormat(ndif.uri)
       end
     end
@@ -420,30 +457,22 @@ module Metadata
     end
 
     def idp_sso_descriptor(idp)
-      attributes = {}
-      attributes[:WantAuthnRequestsSigned] = idp.want_authn_requests_signed
-      root.IDPSSODescriptor(ns, attributes) do |idp_node|
+      root.IDPSSODescriptor(ns) do |idp_node|
         sso_descriptor(idp, idp_node)
 
-        idp.single_sign_on_services.each do |ssos|
-          single_sign_on_service(ssos)
-        end
+        idp.single_sign_on_services { |ds| ds.order(:location) }
+           .each { |ssos| single_sign_on_service(ssos) }
 
-        idp.name_id_mapping_services.each do |nidms|
-          name_id_mapping_service(nidms)
-        end
+        idp.name_id_mapping_services { |ds| ds.order(:location) }
+           .each { |nidms| name_id_mapping_service(nidms) }
 
-        idp.assertion_id_request_services.each do |aidrs|
-          assertion_id_request_service(aidrs)
-        end
+        idp.assertion_id_request_services { |ds| ds.order(:location) }
+           .each { |aidrs| assertion_id_request_service(aidrs) }
 
-        idp.attribute_profiles.each do |ap|
-          root.AttributeProfile(ap.uri)
-        end
+        idp.attribute_profiles { |ds| ds.order(:uri) }
+           .each { |ap| root.AttributeProfile(ap.uri) }
 
-        idp.attributes.each do |a|
-          attribute(a)
-        end
+        idp.attributes { |ds| ds.order(:name) }.each { |a| attribute(a) }
       end
     end
 
@@ -466,19 +495,19 @@ module Metadata
     end
 
     def sp_sso_descriptor(sp)
-      attributes = {}
-      attributes[:AuthnRequestsSigned] = sp.authn_requests_signed
-      attributes[:WantAssertionsSigned] = sp.want_assertions_signed
-      root.SPSSODescriptor(ns, attributes) do |sp_node|
+      root.SPSSODescriptor(ns) do |sp_node|
         sso_descriptor(sp, sp_node)
 
-        sp.assertion_consumer_services.each do |acs|
-          assertion_consumer_service(acs)
-        end
+        sp.assertion_consumer_services { |ds| ds.order(:index, :location) }
+          .each { |acs| assertion_consumer_service(acs) }
 
-        sp.attribute_consuming_services.each do |attrcs|
-          attribute_consuming_service(attrcs)
+        acs = sp.attribute_consuming_services do |ds|
+          ds.qualify
+            .association_join(:service_names)
+            .order(Sequel.qualify(:service_names, :value))
+            .distinct
         end
+        acs.each { |attrcs| attribute_consuming_service(attrcs) }
       end
     end
 
@@ -494,16 +523,15 @@ module Metadata
         isDefault: acs.default
       }
       root.AttributeConsumingService(ns, attributes) do |_acs_node|
-        acs.service_names.each do |service_name|
+        acs.service_names { |ds| ds.order(:value) }.each do |service_name|
           root.ServiceName(service_name.value, 'xml:lang' => service_name.lang)
         end
 
-        acs.service_descriptions.each do |service_description|
-          root.ServiceDescription(service_description.value,
-                                  'xml:lang' => service_description.lang)
+        acs.service_descriptions { |ds| ds.order(:value) }.each do |desc|
+          root.ServiceDescription(desc.value, 'xml:lang' => desc.lang)
         end
 
-        acs.requested_attributes.each do |ra|
+        acs.requested_attributes { |ds| ds.order(:name) }.each do |ra|
           requested_attribute(ra)
         end
       end
@@ -520,23 +548,22 @@ module Metadata
       root.AttributeAuthorityDescriptor(ns) do |aad_node|
         role_descriptor(aad, aad_node)
 
-        aad.attribute_services.each do |as|
+        aad.attribute_services { |ds| ds.order(:location) }.each do |as|
           attribute_service(as)
         end
 
-        aad.assertion_id_request_services.each do |aidrs|
-          assertion_id_request_service(aidrs)
-        end
+        aad.assertion_id_request_services { |ds| ds.order(:location) }
+           .each { |aidrs| assertion_id_request_service(aidrs) }
 
-        aad.name_id_formats.each do |nidf|
+        aad.name_id_formats { |ds| ds.order(:uri) }.each do |nidf|
           root.NameIDFormat(nidf.uri)
         end
 
-        aad.attribute_profiles.each do |ap|
+        aad.attribute_profiles { |ds| ds.order(:uri) }.each do |ap|
           root.AttributeProfile(ap.uri)
         end
 
-        aad.attributes.each do |attr|
+        aad.attributes { |ds| ds.order(:name) }.each do |attr|
           attribute(attr)
         end
       end
@@ -554,29 +581,29 @@ module Metadata
 
     def ui_info(info)
       mdui.UIInfo(ns) do |_|
-        info.display_names.each do |display_name|
+        info.display_names { |ds| ds.order(:value) }.each do |display_name|
           mdui.DisplayName(display_name.value, 'xml:lang' => display_name.lang)
         end
 
-        info.descriptions.each do |description|
+        info.descriptions { |ds| ds.order(:value) }.each do |description|
           mdui.Description(description.value, 'xml:lang' => description.lang)
         end
 
-        info.keyword_lists.each do |keywords|
+        info.keyword_lists { |ds| ds.order(:content) }.each do |keywords|
           mdui.Keywords(keywords.content, 'xml:lang' => keywords.lang)
         end
 
-        info.logos.each do |logo|
+        info.logos { |ds| ds.order(:uri) }.each do |logo|
           attributes = { height: logo.height, width: logo.width }
           attributes['xml:lang'] = logo.lang if logo.lang.present?
           mdui.Logo(logo.uri, attributes)
         end
 
-        info.information_urls.each do |url|
+        info.information_urls { |ds| ds.order(:uri) }.each do |url|
           mdui.InformationURL(url.uri, 'xml:lang' => url.lang)
         end
 
-        info.privacy_statement_urls.each do |url|
+        info.privacy_statement_urls { |ds| ds.order(:uri) }.each do |url|
           mdui.PrivacyStatementURL(url.uri, 'xml:lang' => url.lang)
         end
       end
@@ -584,16 +611,16 @@ module Metadata
 
     def disco_hints(disco)
       mdui.DiscoHints(ns) do |_|
-        disco.ip_hints.each do |ip_hint|
+        disco.ip_hints { |ds| ds.order(:block) }.each do |ip_hint|
           mdui.IPHint(ip_hint.block)
         end
 
-        disco.domain_hints.each do |domain_hint|
+        disco.domain_hints { |ds| ds.order(:domain) }.each do |domain_hint|
           mdui.DomainHint(domain_hint.domain)
         end
 
-        disco.geolocation_hints.each do |geolocation_hint|
-          mdui.GeolocationHint(geolocation_hint.uri)
+        disco.geolocation_hints { |ds| ds.order(:uri) }.each do |gh|
+          mdui.GeolocationHint(gh.uri)
         end
       end
     end

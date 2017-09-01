@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Be sure to restart your server when you modify this file.
 
 # Add new inflection rules using the following format. Inflections
@@ -22,4 +24,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'MDRPI'
   inflect.acronym 'MDATTR'
   inflect.acronym 'API'
+  inflect.acronym 'SIRTFI'
 end

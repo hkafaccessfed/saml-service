@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProtocolSupport < SamlURI
   many_to_one :role_descriptor
 

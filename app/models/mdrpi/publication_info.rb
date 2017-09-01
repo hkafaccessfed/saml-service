@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MDRPI
   class PublicationInfo < Sequel::Model
     include Parents
@@ -11,11 +13,11 @@ module MDRPI
 
     def validate
       super
-      validates_presence [:publisher, :created_at, :updated_at]
+      validates_presence %i[publisher created_at updated_at]
       return if new?
 
       validates_presence :usage_policies
-      single_parent [:metadata_instance, :entity_descriptor]
+      single_parent %i[metadata_instance entity_descriptor]
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe UpdateFromFederationRegistry do
@@ -28,7 +30,7 @@ RSpec.describe UpdateFromFederationRegistry do
     %(AAF-FR-EXPORT service="saml-service", key="#{fr_source.secret}")
   end
   let(:request_headers) { { 'Authorization' => authorization } }
-  let(:truncated_now) { Time.at(Time.now.to_i) }
+  let(:truncated_now) { Time.zone.at(Time.now.to_i) }
 
   delegate :entity_source, to: :fr_source
   delegate :known_entities, to: :entity_source
@@ -38,7 +40,8 @@ RSpec.describe UpdateFromFederationRegistry do
       "#{kind.to_s.sub('_', '')}"
 
     stub_request(:get, url).with(headers: request_headers)
-      .to_return(status: 200, body: JSON.generate(kind => send(kind)))
+                           .to_return(status: 200,
+                                      body: JSON.generate(kind => send(kind)))
   end
 
   def self.verify_attributes(attr_generators)

@@ -1,12 +1,11 @@
-# No need for API documentation.
-Documentation:
-  Enabled: false
+---
+inherit_gem:
+  aaf-gumboot: aaf-rubocop.yml
 
 AllCops:
+  TargetRubyVersion: 2.2
   Exclude:
-    - config/initializers/secret_token.rb
     - db/**/*
-    - Guardfile
 
 AbcSize:
   Exclude:
@@ -27,3 +26,29 @@ CyclomaticComplexity:
 PerceivedComplexity:
   Exclude:
     - lib/metadata/saml.rb
+
+BlockLength:
+  Exclude:
+    - lib/metadata/saml.rb
+    - spec/**/*.rb
+    - lib/tasks/*.rake
+    - config/**/*.rb
+    - db/**/*.rb
+
+# List duplicated from here, but with `touch` removed:
+# https://github.com/bbatsov/rubocop/blob/863037ac719d3539c1dd7e7f7715915f5b612c93/config/default.yml#L1539-L1551
+Rails/SkipsModelValidations:
+  Blacklist:
+    - decrement!
+    - decrement_counter
+    - increment!
+    - increment_counter
+    - toggle!
+    - update_all
+    - update_attribute
+    - update_column
+    - update_columns
+    - update_counters
+
+Rails/FindEach:
+  Enabled: false

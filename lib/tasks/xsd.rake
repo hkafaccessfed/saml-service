@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :xsd do
   schemas = {
     'schema/xml.xsd' =>
@@ -49,7 +51,10 @@ namespace :xsd do
     'http://docs.oasis-open.org/wsfed/federation/v1.2/os/ws-federation.xsd',
 
     'schema/ws-privacy.xsd' =>
-    'http://docs.oasis-open.org/wsfed/authorization/v1.2/os/ws-authorization.xsd'
+    'http://docs.oasis-open.org/wsfed/authorization/v1.2/os/ws-authorization.xsd',
+
+    'schema/refeds_metadata_extension_schema.xsd' =>
+    'https://s3-ap-southeast-2.amazonaws.com/aaf-binaries/schema/refeds_metadata_extension_schema.xsd'
   }
 
   task all: schemas.keys

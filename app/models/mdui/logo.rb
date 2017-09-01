@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 module MDUI
   class Logo < Sequel::Model
     many_to_one :ui_info
 
     def validate
       super
-      uri_regexp = URI.regexp(%w(http https))
-      validates_presence [:ui_info, :uri, :width, :height,
-                          :created_at, :updated_at]
+      uri_regexp = URI.regexp(%w[http https])
+      validates_presence %i[ui_info uri width height
+                            created_at updated_at]
       validates_format uri_regexp, :uri
 
       validate_width
@@ -16,11 +18,11 @@ module MDUI
     private
 
     def validate_width
-      errors.add(:width, 'must specify pixels') unless width && width > 0
+      errors.add(:width, 'must specify pixels') unless width.try!(:positive?)
     end
 
     def validate_height
-      errors.add(:height, 'must specify pixels') unless height && height > 0
+      errors.add(:height, 'must specify pixels') unless height.try!(:positive?)
     end
   end
 end

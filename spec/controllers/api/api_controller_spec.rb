@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require 'gumboot/shared_examples/api_controller'
@@ -7,12 +9,12 @@ RSpec.describe API::APIController, type: :controller do
 
   context 'requesting resource that does not exist' do
     let(:api_subject) { create(:api_subject) }
-    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" }
+    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup }
 
     controller(API::APIController) do
       def missing_resource
         public_action
-        fail(API::APIController::ResourceNotFound)
+        raise(API::APIController::ResourceNotFound)
       end
     end
 
@@ -35,12 +37,12 @@ RSpec.describe API::APIController, type: :controller do
 
   context 'a bad request' do
     let(:api_subject) { create(:api_subject) }
-    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" }
+    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup }
 
     controller(API::APIController) do
       def a_bad_request
         public_action
-        fail(API::APIController::BadRequest)
+        raise(API::APIController::BadRequest)
       end
     end
 

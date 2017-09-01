@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ETL
   module IdentityProviders
     include SSODescriptors
@@ -22,7 +24,7 @@ module ETL
       idp = create_or_update_by_fr_id(ds, idp_data[:id], attrs) do |obj|
         obj.entity_descriptor = ed
         obj.organization = ed.organization
-        ed.known_entity.tag_as(Tag::IdP)
+        ed.known_entity.tag_as(Tag::IDP)
       end
 
       idp_saml_core(idp, idp_data)
@@ -32,7 +34,7 @@ module ETL
     def idp_attrs(idp_data)
       saml = idp_data[:saml]
       {
-        created_at: Time.parse(idp_data[:created_at]),
+        created_at: Time.zone.parse(idp_data[:created_at]),
         enabled: idp_data[:functioning],
         error_url: saml[:sso_descriptor][:role_descriptor][:error_url],
         want_authn_requests_signed: saml[:authnrequests_signed]
@@ -109,7 +111,7 @@ module ETL
 
     def destroy_attributes(idp)
       idp.attributes.each do |attr|
-        attr.name_format.destroy if attr.name_format
+        attr.name_format.try!(:destroy)
         attr.destroy
       end
     end

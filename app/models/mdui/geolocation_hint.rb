@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module MDUI
   class GeolocationHint < Sequel::Model
     many_to_one :disco_hints
 
     def validate
       super
-      validates_presence [:disco_hints, :uri, :created_at, :updated_at]
+      validates_presence %i[disco_hints uri created_at updated_at]
     end
 
     def latitude

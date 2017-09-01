@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'EntityDescriptor xml' do
   let(:entity_descriptor) { create :entity_descriptor, :with_technical_contact }
   let(:known_entity) { entity_descriptor.known_entity }
